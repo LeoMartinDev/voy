@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslation } from "react-i18next";
-import { LanguageSwitcher } from "@/routes/_authed/-components/settings/language-switcher";
 import {
 	Card,
 	CardContent,
@@ -9,6 +8,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/client/components/ui/card";
+import { LanguageSwitcher } from "@/routes/_authed/-components/settings/language-switcher";
 import { useSettingsLayout } from "@/routes/_authed/settings";
 
 export function GeneralSection() {

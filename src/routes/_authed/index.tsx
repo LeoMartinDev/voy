@@ -2,11 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Lock } from "lucide-react";
 import { useId } from "react";
 import { useTranslation } from "react-i18next";
-import { KeyboardHints } from "@/routes/_authed/-components/keyboard-hints";
 import { SearchBar } from "@/client/components/search-bar";
 import { SearchLogo } from "@/client/components/search-logo";
 import { ThemeToggle } from "@/client/components/theme-toggle";
 import { UserDropdown } from "@/client/components/user-dropdown";
+import { KeyboardHints } from "@/routes/_authed/-components/keyboard-hints";
 
 export const Route = createFileRoute("/_authed/")({
 	component: HomePage,
