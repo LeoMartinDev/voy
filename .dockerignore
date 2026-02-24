@@ -1,0 +1,30 @@
+# Dependencies
+node_modules
+bun.lockb
+
+# Development
+.git
+.github
+.vscode
+.idea
+
+# Build outputs
+dist
+.output
+
+# Database
+*.db
+*.sqlite
+
+# Configs
+.env
+.env.*
+!.env.example
+
+# Docs
+README.md
+AGENTS.md
+
+# IDE
+*.swp
+*.swo

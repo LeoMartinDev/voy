@@ -1,0 +1,25 @@
+services:
+  app:
+    build:
+      context: .
+      target: dev
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+      - app-data:/data
+    environment:
+      BUN_ENV: development
+      DATABASE_URL: /data/app.db
+      SEARXNG_URL: http://searxng:8080
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      INSTANCE_NAME: ${INSTANCE_NAME}
+      SITE_URL: ${SITE_URL}
+    ports:
+      - "3000:3000"
+    depends_on:
+      searxng:
+        condition: service_healthy
+
+volumes:
+  node_modules:

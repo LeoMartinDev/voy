@@ -1,0 +1,117 @@
+export const en = {
+	translation: {
+		common: {
+			search: "Search",
+			settings: "Settings",
+			save: "Save",
+			cancel: "Cancel",
+			back: "Back",
+			loading: "Loading...",
+			saving: "Saving...",
+			saveChanges: "Save changes",
+			savedSuccess: "Settings saved successfully",
+			savedError: "Failed to save settings",
+		},
+		search: {
+			placeholder: "What are you looking for?",
+			noResults: "No results found for",
+			images: "Images",
+			videos: "Videos",
+			news: "News",
+			web: "Web",
+			files: "Files",
+			filterResults: "Filter search results",
+			anyTime: "Any time",
+			pastDay: "Past day",
+			pastMonth: "Past month",
+			pastYear: "Past year",
+		},
+		shortcuts: {
+			toSearch: "to search",
+			toClose: "to close",
+			toNavigate: "to navigate",
+			skipToSearch: "Skip to search",
+			suggestion: "Suggestion",
+		},
+		settings: {
+			title: "Settings",
+			language: "Language",
+			theme: "Theme",
+			appearance: "Appearance",
+			privacy: "Privacy",
+			about: "About",
+			server: "Server",
+			api: "API",
+			ai: "AI",
+			general: "General",
+			generalDescription: "Configure general settings for the application.",
+			languageDescription: "Choose your preferred language",
+			adminDescription: "Manage server configuration and your preferences",
+			userDescription: "Manage your account and application preferences",
+
+			// Appearance
+			themeTitle: "Theme",
+			themeDescription: "Choose your preferred color scheme",
+
+			// Search
+			safeSearchTitle: "Safe Search",
+			safeSearchDescription: "Explicit content filtering",
+			linkBehaviorTitle: "Link Behavior",
+			linkBehaviorDescription: "How results open",
+			openInNewTabLabel: "Open in new tab",
+			openInNewTabDescription: "Keep search results open",
+			defaultCategoryTitle: "Default Category",
+			defaultCategoryDescription: "Preferred search category",
+			defaultCategoryContent: "Web, Images, or Files",
+			comingSoon: "Coming soon",
+
+			// Privacy
+			privacyTitle: "Search Privacy",
+			privacyDescription: "How your searches are handled",
+			privacyContentTitle: "Your searches never leave your server",
+			privacyContentDescription:
+				"This instance is self-hosted. All searches are proxied through your own server.",
+			dataStorageTitle: "Data Storage",
+			dataStorageDescription: "How your data is stored",
+			dataStorageContent:
+				"Settings are stored locally. No data is sent to third parties.",
+
+			// About
+			aboutTitle: "Self-Hosted Metasearch",
+			aboutDescription: "Your private gateway to the web",
+			aboutContent:
+				"A self-hosted metasearch engine that aggregates results from multiple sources while keeping your searches private. All queries are proxied through your own server.",
+			privacyFirst: "Privacy First",
+			noTracking: "No tracking",
+			selfHosted: "Self-Hosted",
+			fullControl: "Full control",
+			encrypted: "Encrypted",
+			secureConnections: "Secure connections",
+			openSource: "Open Source",
+			transparent: "Transparent",
+			technology: "Technology",
+			resources: "Resources",
+			githubRepo: "GitHub Repository",
+
+			safeSearch: "Safe Search",
+			openInNewTab: "Open results in new tab",
+		},
+		safeSearch: {
+			off: "Off",
+			offDescription: "No filtering",
+			moderate: "Moderate",
+			moderateDescription: "Filters explicit content",
+			strict: "Strict",
+			strictDescription: "Strict filtering",
+		},
+		themes: {
+			light: "Light",
+			dark: "Dark",
+			system: "System",
+		},
+		languages: {
+			en: "English",
+			fr: "Français",
+		},
+	},
+};
