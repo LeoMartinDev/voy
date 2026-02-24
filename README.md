@@ -206,14 +206,6 @@ The image is automatically built and pushed to `ghcr.io/LeoMartinDev/voy:latest`
 | **searxng** | SearXNG metasearch backend         |
 | **valkey**  | Redis-compatible cache for SearXNG |
 
-## Roadmap
-
-- [ ] Mobile app (PWA)
-- [ ] Browser extension for easier search integration
-- [ ] More AI providers (OpenAI, Anthropic, Ollama)
-- [ ] Customizable search engines and weighting
-- [ ] Multi-user support with different permissions
-
 ## Contributing
 
 Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a pull request.
