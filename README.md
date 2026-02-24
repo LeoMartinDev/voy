@@ -29,63 +29,143 @@ A self-hosted, privacy-first metasearch engine built on top of [SearXNG](https:/
 
 **Infrastructure:** SearXNG, Valkey (Redis-compatible), Docker
 
-## Quick Start
+## Deployment
+
+Deploy Voy on any server without cloning the repository — the image is pulled directly from GHCR.
 
 ### Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
 
-### 1. Clone the repository
+### 1. Create a `compose.yml`
 
-```bash
-git clone https://github.com/LeoMartinDev/voy.git
-cd voy
+```yaml
+services:
+  app:
+    image: ghcr.io/leomartindev/voy:latest
+    restart: unless-stopped
+    environment:
+      BUN_ENV: production
+      DATABASE_URL: /data/app.db
+      SEARXNG_URL: http://searxng:8080
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      INSTANCE_NAME: ${INSTANCE_NAME}
+      SITE_URL: ${SITE_URL}
+    volumes:
+      - app-data:/data
+    ports:
+      - "3000:3000"
+    depends_on:
+      searxng:
+        condition: service_healthy
+    networks:
+      - searchengine-network
+
+  valkey:
+    image: valkey/valkey:8-alpine
+    restart: unless-stopped
+    command: valkey-server --save 30 1 --loglevel warning
+    volumes:
+      - valkey-data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - searchengine-network
+
+  searxng:
+    image: searxng/searxng:latest
+    restart: unless-stopped
+    environment:
+      SEARXNG_SECRET: ${SEARXNG_SECRET}
+      UWSGI_WORKERS: 2
+      UWSGI_THREADS: 2
+      UWSGI_ENABLE_THREADS: true
+    volumes:
+      - searxng-data:/var/cache/searxng
+    depends_on:
+      valkey:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - searchengine-network
+
+configs:
+  searxng_settings:
+    content: |
+      use_default_settings: true
+
+      server:
+        secret_key: ${SEARXNG_SECRET}
+        image_proxy: false
+        limiter: false
+        public_instance: false
+        max_results: 20
+
+      engines:
+        - name: yahoo
+          disabled: true
+
+      search:
+        autocomplete: duckduckgo
+        autocomplete_min: 3
+        max_page: 1
+        formats:
+          - json
+        categories:
+          - general
+          - images
+          - files
+
+      outgoing:
+        max_request_timeout: 1.8
+
+      enabled_plugins: []
+
+      valkey:
+        url: valkey://valkey:6379/0
+
+volumes:
+  app-data:
+  valkey-data:
+  searxng-data:
+
+networks:
+  searchengine-network:
+    driver: bridge
 ```
 
 ### 2. Create a `.env` file
-
-```bash
-cp .env.example .env
-```
-
-Or create one manually:
 
 ```env
 BETTER_AUTH_SECRET=your-secret-key-here
 SEARXNG_SECRET=your-searxng-secret-here
 INSTANCE_NAME=Voy
-SITE_URL=http://localhost:3000
+SITE_URL=https://your-domain.com
 ```
 
 > Generate secure secrets with `openssl rand -base64 32`
 
-### 3. Start the application
-
-**Production** (uses pre-built image from GHCR):
+### 3. Start
 
 ```bash
-docker compose -f compose.yml up -d
+docker compose up -d
 ```
 
-**Development** (builds from source with hot reload):
+Navigate to your `SITE_URL`. On first launch, the setup wizard will guide you through configuring safe search and creating your admin account.
 
-```bash
-docker compose up
-```
+### 4. Set as default search engine
 
-### 4. Open the app
-
-Navigate to [http://localhost:3000](http://localhost:3000). On first launch, the setup wizard will guide you through configuring safe search and creating your admin account.
-
-### 5. Setup as default search engine
-
-To set Voy as your default search engine in your browser:
-
-1. Open your browser settings
-2. Find the "Search" or "Search engine" settings
-3. Add a new search engine with the following details:
-   - Name: Your instance name (e.g. "Voy")
-   - URL: `SITE_URL/search?q=%s` (e.g. `https://myapp.com/search?q=%s`)
+1. Open your browser settings and find "Search engine"
+2. Add a new search engine:
+   - Name: your instance name (e.g. "Voy")
+   - URL: `https://your-domain.com/search?q=%s`
 
 ## Configuration
 
@@ -148,15 +228,16 @@ curl "http://localhost:3000/api/search?q=test&key=voy_a1b2c3d4..."
 - [Bun](https://bun.sh) (v1+)
 - [Docker](https://docs.docker.com/get-docker/) (for SearXNG and Valkey)
 
-### Local Development with Docker
-
-The easiest way to develop is with Docker Compose, which sets up everything including SearXNG and Valkey:
+### Setup
 
 ```bash
+git clone https://github.com/LeoMartinDev/voy.git
+cd voy
+cp .env.example .env
 docker compose up
 ```
 
-This mounts the source code and enables hot reload.
+This starts SearXNG and Valkey, mounts the source code, and enables hot reload. Open [http://localhost:3000](http://localhost:3000).
 
 ### Available Scripts
 
@@ -197,14 +278,6 @@ The production image is a multi-stage build:
 4. **runner** — minimal production image, runs as non-root user
 
 The image is automatically built and pushed to `ghcr.io/LeoMartinDev/voy:latest` on every push to `main`.
-
-### Services
-
-| Service     | Description                        |
-| ----------- | ---------------------------------- |
-| **app**     | The Voy application (port 3000)    |
-| **searxng** | SearXNG metasearch backend         |
-| **valkey**  | Redis-compatible cache for SearXNG |
 
 ## Contributing
 
