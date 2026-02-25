@@ -83,11 +83,11 @@ function ResultCard({
 export function WebResultsSkeleton() {
 	return (
 		<section
-			className="flex flex-col gap-8 px-4"
+			className="flex flex-col gap-10 px-4"
 			aria-label="Loading search results"
 			aria-busy="true"
 		>
-			<div className="flex flex-col space-y-8">
+			<div className="flex flex-col space-y-10">
 				{[0, 1, 2, 3, 4].map((i) => (
 					<div
 						key={`web-skeleton-${i}`}
@@ -145,7 +145,7 @@ export function WebResults({
 					/>
 				</div>
 
-				<div className="flex flex-col space-y-8">
+				<div className="flex flex-col space-y-10">
 					{results.map((result, i) => (
 						<ResultCard
 							key={`${i}-${result.url}`}
