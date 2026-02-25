@@ -34,7 +34,7 @@ function ImageCard({ result, linkTargetProps, index }: ImageCardProps) {
 		<a
 			href={result.imageSrc ?? result.url}
 			{...linkTargetProps}
-			className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-muted/30 ring-1 ring-border/30 transition-all duration-500 hover:ring-primary/30 hover:shadow-xl hover:shadow-foreground/5"
+			className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-muted/30 ring-1 ring-border/30 transition-all duration-500 hover:shadow-2xl hover:shadow-foreground/10"
 			style={{
 				animationDelay: `${index * 30}ms`,
 			}}

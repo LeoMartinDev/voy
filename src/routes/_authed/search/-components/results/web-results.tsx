@@ -43,7 +43,7 @@ function ResultCard({
 
 	return (
 		<article
-			className="group relative rounded-2xl transition-all duration-300 hover:bg-muted/30 -mx-4 px-4 py-4"
+			className="group relative rounded-2xl transition-all duration-300 hover:bg-muted/60 hover:shadow-sm -mx-4 px-4 py-4"
 			style={{
 				animationDelay: `${index * 50}ms`,
 			}}

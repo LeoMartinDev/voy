@@ -133,7 +133,7 @@ function FileCard({ result, index, linkTargetProps }: FileCardProps) {
 		<a
 			href={result.url}
 			{...linkTargetProps}
-			className="group flex items-start gap-4 rounded-2xl p-5 -mx-5 transition-all duration-300 hover:bg-muted/40"
+			className="group flex items-start gap-4 rounded-2xl p-5 -mx-5 transition-all duration-300 hover:bg-muted/60 hover:shadow-sm"
 			style={{
 				animationDelay: `${index * 50}ms`,
 			}}
