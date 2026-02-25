@@ -133,28 +133,28 @@ function FileCard({ result, index, linkTargetProps }: FileCardProps) {
 		<a
 			href={result.url}
 			{...linkTargetProps}
-			className="group flex items-start gap-4 rounded-2xl p-5 -mx-5 transition-all duration-300 hover:bg-muted/60 hover:shadow-sm"
+			className="group flex items-start gap-4 rounded-xl border border-transparent p-4 transition-all duration-200 hover:border-border/50 hover:bg-muted/50 hover:shadow-sm"
 			style={{
 				animationDelay: `${index * 50}ms`,
 			}}
 		>
 			<div
 				className={`
-					flex h-14 w-14 shrink-0 items-center justify-center rounded-xl
+					flex h-12 w-12 shrink-0 items-center justify-center rounded-lg
 					${config.bg} ring-1 ring-border/50
-					transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg
+					transition-all duration-300 group-hover:scale-105 group-hover:shadow-md
 				`}
 			>
-				<Icon className={`h-7 w-7 ${config.color}`} />
+				<Icon className={`h-6 w-6 ${config.color}`} />
 			</div>
 
-			<div className="flex flex-col gap-2 min-w-0 flex-1">
-				<div className="flex items-center gap-2">
+			<div className="flex flex-col gap-1 min-w-0 flex-1">
+				<div className="flex items-center gap-2 mb-0.5">
 					<span className="text-xs text-muted-foreground">{hostname}</span>
 					{result.extension && (
 						<span
 							className={`
-								inline-flex items-center rounded-md px-2 py-0.5
+								inline-flex items-center rounded-md px-1.5 py-0.5
 								text-[10px] font-bold uppercase tracking-wide
 								${config.bg} ${config.color}
 								ring-1 ring-border/30
@@ -165,11 +165,11 @@ function FileCard({ result, index, linkTargetProps }: FileCardProps) {
 					)}
 				</div>
 
-				<h2 className="font-semibold text-foreground leading-snug group-hover:text-primary transition-colors duration-200 line-clamp-2">
+				<h2 className="text-lg font-medium text-blue-700 dark:text-blue-300 group-hover:underline leading-tight line-clamp-2">
 					{result.title}
 				</h2>
 
-				<p className="text-xs text-muted-foreground/70 truncate">
+				<p className="text-xs text-green-700 dark:text-green-400 truncate opacity-80">
 					{result.url}
 				</p>
 			</div>
@@ -193,12 +193,12 @@ export function FileResultsSkeleton() {
 				{[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
 					<div
 						key={`file-skeleton-${i}`}
-						className="flex items-start gap-4 rounded-2xl p-5 -mx-5"
+						className="flex items-start gap-4 rounded-xl border border-transparent p-4"
 						style={{
 							animationDelay: `${i * 100}ms`,
 						}}
 					>
-						<div className="h-14 w-14 shrink-0 rounded-xl bg-muted animate-pulse" />
+						<div className="h-12 w-12 shrink-0 rounded-lg bg-muted animate-pulse" />
 
 						<div className="flex flex-col gap-2 min-w-0 flex-1 py-1">
 							<div className="flex items-center gap-2">
@@ -243,13 +243,15 @@ export function FileResults({
 
 	return (
 		<section className="flex flex-col gap-6" aria-label="File search results">
-			<ResultsHeader
-				count={results.length}
-				query={query}
-				duration={duration}
-				cached={cached}
-				type="file"
-			/>
+			<div className="mb-4 px-4">
+				<ResultsHeader
+					count={results.length}
+					query={query}
+					duration={duration}
+					cached={cached}
+					type="file"
+				/>
+			</div>
 
 			<div className="flex flex-col">
 				{results.map((result, i) => (

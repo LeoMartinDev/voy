@@ -59,7 +59,7 @@ export function SearchFilters({
 	)?.labelKey;
 
 	return (
-		<div className="flex w-full items-center justify-between gap-4">
+		<div className="flex w-full items-center gap-8">
 			<nav
 				className="flex items-center gap-5"
 				aria-label={t("search.filterResults")}
