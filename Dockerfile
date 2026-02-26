@@ -65,10 +65,10 @@ VOLUME ["/data"]
 
 USER nodejs
 
-EXPOSE 3000
+EXPOSE $PORT
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://0.0.0.0:3000/api/health || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://0.0.0.0:$PORT/api/health || exit 1
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["bun", "run", "server.ts"]

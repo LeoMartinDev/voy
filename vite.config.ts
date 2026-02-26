@@ -13,6 +13,7 @@ const config = defineConfig({
 		},
 	},
 	server: {
+		port: Number(process.env.PORT) || 3000,
 		hmr: {
 			host: "localhost",
 		},

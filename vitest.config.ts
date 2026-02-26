@@ -8,7 +8,7 @@ export default defineConfig({
 		env: {
 			SEARXNG_URL: "http://localhost:8080",
 			BETTER_AUTH_SECRET: "test-secret",
-			SITE_URL: "http://localhost:3000",
+			SITE_URL: `http://localhost:${process.env.PORT || 3000}`,
 			DATABASE_URL: ":memory:",
 		},
 	},
