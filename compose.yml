@@ -10,8 +10,6 @@ services:
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
       INSTANCE_NAME: ${INSTANCE_NAME}
       SITE_URL: ${SITE_URL}
-    ports:
-      - "${PORT:-3000}:${PORT:-3000}"
     volumes:
       - app-data:/data
     depends_on:
