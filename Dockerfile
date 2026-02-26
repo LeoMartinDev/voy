@@ -47,7 +47,8 @@ ENV PORT=3000
 RUN addgroup --system --gid 1001 nodejs && \
   adduser --system --uid 1001 nodejs && \
   mkdir -p /data && \
-  chown -R nodejs:nodejs /data
+  chown -R nodejs:nodejs /data && \
+  apk add --no-cache su-exec
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
@@ -62,8 +63,6 @@ RUN chown -R nodejs:nodejs /app && \
   chmod +x /docker-entrypoint.sh
 
 VOLUME ["/data"]
-
-USER nodejs
 
 EXPOSE $PORT
 

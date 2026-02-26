@@ -2,9 +2,11 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { useIsMobile } from "@/client/hooks/use-mobile";
 
 export function KeyboardHints({ onSlashPress }: { onSlashPress?: () => void }) {
 	const { t } = useTranslation();
+	const isMobile = useIsMobile();
 	const callbackRef = useRef(onSlashPress);
 
 	// Keep callback ref up-to-date without re-registering the listener
@@ -29,6 +31,8 @@ export function KeyboardHints({ onSlashPress }: { onSlashPress?: () => void }) {
 		window.addEventListener("keydown", handler);
 		return () => window.removeEventListener("keydown", handler);
 	}, [handler]);
+
+	if (isMobile) return null;
 
 	return (
 		<div

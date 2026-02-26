@@ -36,6 +36,12 @@ const config = defineConfig({
 			},
 		}),
 	],
+	optimizeDeps: {
+		exclude: ["better-auth"],
+	},
+	ssr: {
+		external: ["better-auth"],
+	},
 });
 
 export default config;
