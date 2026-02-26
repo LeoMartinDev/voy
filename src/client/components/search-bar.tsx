@@ -317,7 +317,7 @@ export function SearchBar({
 						)}
 
 						{suggestions.length > 0 && (
-							<div className="mt-1 border-t border-border/30 px-4 py-2 bg-muted/20">
+							<div className="hidden lg:block mt-1 border-t border-border/30 px-4 py-2 bg-muted/20">
 								<div className="flex items-center justify-between text-[10px] text-muted-foreground/60 font-medium uppercase tracking-wider">
 									<span>{t("shortcuts.suggestion")}</span>
 									<div className="flex gap-3">

@@ -10,23 +10,7 @@ COPY bun.lockb* ./
 RUN bun install --frozen-lockfile
 
 # =========================
-# Stage 2 — Development
-# =========================
-FROM oven/bun:1-alpine AS dev
-
-WORKDIR /app
-
-COPY package.json ./
-COPY bun.lockb* ./
-RUN bun install
-COPY docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
-
-ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["bun", "run", "dev"]
-
-# =========================
-# Stage 3 — Builder
+# Stage 2 — Builder
 # =========================
 FROM base AS builder
 
@@ -37,7 +21,7 @@ RUN bun run db:generate
 RUN bun run build
 
 # =========================
-# Stage 4 — Production
+# Stage 3 — Production
 # =========================
 FROM oven/bun:1-alpine AS runner
 

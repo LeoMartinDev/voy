@@ -12,6 +12,7 @@ i18n
 			en,
 			fr,
 		},
+		lng: typeof window === "undefined" ? "en" : undefined, // Force English on server
 		fallbackLng: "en",
 		supportedLngs: ["en", "fr"],
 		load: "languageOnly",

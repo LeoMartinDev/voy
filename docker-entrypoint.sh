@@ -12,7 +12,7 @@ if [ "$(id -u)" = "0" ]; then
     echo "[INFO] Starting server..."
     exec su-exec nodejs:nodejs "$@"
 else
-    # If already running as non-root (e.g. dev mode), just run normally
+    # If already running as non-root, just run normally
     echo "[INFO] Running database migrations..."
     bun run db:migrate
 

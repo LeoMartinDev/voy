@@ -49,7 +49,7 @@ function HomePage() {
 				href={`#${mainSearchId}`}
 				className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-foreground focus:px-5 focus:py-3 focus:text-background focus:outline-none focus:shadow-lg"
 			>
-				{t("shortcuts.skipToSearch")}
+				{t("shortcuts.skipToSearch") || "Skip to search"}
 			</a>
 
 			<header className="relative z-10 flex items-center justify-end px-6 py-5 md:px-10">
@@ -70,7 +70,7 @@ function HomePage() {
 
 					<div className="relative z-20 w-full animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-backwards delay-150">
 						<SearchBar variant="home" autoFocus />
-						<div className="mt-4 flex justify-center">
+						<div className="hidden lg:flex mt-4 justify-center">
 							<KeyboardHints />
 						</div>
 					</div>
