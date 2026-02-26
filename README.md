@@ -45,6 +45,8 @@ services:
     image: ghcr.io/leomartindev/voy:latest
     restart: unless-stopped
     environment:
+      # Port for the application (default: 3000)
+      PORT: ${PORT:-3000}
       BUN_ENV: production
       DATABASE_URL: /data/app.db
       SEARXNG_URL: http://searxng:8080
@@ -54,7 +56,7 @@ services:
     volumes:
       - app-data:/data
     ports:
-      - "3000:3000"
+      - "${PORT:-3000}:${PORT:-3000}"
     depends_on:
       searxng:
         condition: service_healthy
