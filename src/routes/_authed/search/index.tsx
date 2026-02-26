@@ -269,6 +269,7 @@ function SearchPage() {
 							}
 						>
 							<SearchResultsList
+								key={`${query}-${activeCategory}-${activeTimeRange ?? "all"}`}
 								query={query}
 								category={activeCategory}
 								timeRange={activeTimeRange}
