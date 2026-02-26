@@ -7,7 +7,7 @@
 
 A self-hosted, privacy-first metasearch engine built on top of [SearXNG](https://searxng.github.io/searxng/). All searches are proxied through your own server — no tracking, no data sent to third parties.
 
-![Voy Screenshot](./assets/voy.png)
+![Voy Screenshot](./assets/voy.gif)
 
 ## Features
 
