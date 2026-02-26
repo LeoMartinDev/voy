@@ -32,7 +32,7 @@ function ImageCard({ result, linkTargetProps, index }: ImageCardProps) {
 
 	return (
 		<a
-			href={result.imageSrc ?? result.url}
+			href={result.imageSrc || result.url}
 			{...linkTargetProps}
 			className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-muted/30 ring-1 ring-border/30 transition-all duration-500 hover:shadow-2xl hover:shadow-foreground/10"
 			style={{
@@ -40,7 +40,7 @@ function ImageCard({ result, linkTargetProps, index }: ImageCardProps) {
 			}}
 		>
 			<img
-				src={result.thumbnail ?? result.imageSrc ?? ""}
+				src={result.thumbnail || result.imageSrc || undefined}
 				alt={result.title}
 				loading="lazy"
 				decoding="async"
@@ -145,7 +145,7 @@ export function ImageResults({
 			<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 lg:grid-cols-4">
 				{results.map((result, i) => (
 					<ImageCard
-						key={result.url}
+						key={`${i}-${result.url}`}
 						result={result}
 						linkTargetProps={linkTargetProps}
 						index={i}

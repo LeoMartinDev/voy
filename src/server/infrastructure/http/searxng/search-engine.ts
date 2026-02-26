@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod";
 import { config } from "@/server/config";
 import type { SearchEngine } from "@/server/domain/ports";
 import type {
@@ -27,7 +27,7 @@ const resolveImageUrl = (
 	return `${config.searxng.url}${withLeadingSlash}`;
 };
 
-const ParsedUrlSchema = z.array(z.string().nullable());
+const ParsedUrlSchema = z.array(z.string().nullable()).nullable().optional();
 
 const stringToDateSchema = z
 	.string()
@@ -42,7 +42,7 @@ const stringToDateSchema = z
 export const SearXNGResultSchema = z.object({
 	title: z.string(),
 	url: z.string(),
-	content: z.string(),
+	content: z.string().nullable().optional(),
 	engine: z.string(),
 	engines: z.array(z.string()),
 	positions: z.array(z.number()),
@@ -142,7 +142,10 @@ export const makeSearXngSearchEngine = (): SearchEngine => {
 				results: searXngResponse.results
 					.filter((r) => {
 						if (category === SearchCategory.IMAGES) {
-							return r.img_src != null;
+							return (
+								resolveImageUrl(r.img_src) != null ||
+								resolveImageUrl(r.thumbnail) != null
+							);
 						}
 						return true;
 					})
@@ -170,7 +173,7 @@ export const makeSearXngSearchEngine = (): SearchEngine => {
 							type: ResultType.WEB,
 							title: r.title,
 							url: r.url,
-							content: r.content,
+							content: r.content ?? "",
 							publishedDate: r.publishedDate ?? r.pubdate ?? undefined,
 						};
 					}),
