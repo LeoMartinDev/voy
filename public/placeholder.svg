@@ -1,0 +1,16 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .bg { fill: #f1f5f9; }
+    .icon { stroke: #cbd5e1; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #1e293b; }
+      .icon { stroke: #334155; }
+    }
+  </style>
+  <rect width="800" height="600" class="bg"/>
+  <g transform="translate(280, 180) scale(10)">
+    <rect width="18" height="18" x="3" y="3" rx="2" ry="2" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon"/>
+    <circle cx="9" cy="9" r="2" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon"/>
+    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon"/>
+  </g>
+</svg>
