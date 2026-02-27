@@ -25,13 +25,19 @@ export const searchQueryOptions = ({
 		queryFn: async () => {
 			if (!query) throw new Error("Query is required");
 
-			return searchFn({
+			const result = await searchFn({
 				data: {
 					query,
 					category,
 					timeRange,
 				},
 			});
+
+			if (!result.success) {
+				throw new Error(result.error);
+			}
+
+			return result.data;
 		},
 		staleTime,
 		gcTime: Infinity,

@@ -42,9 +42,12 @@ export const searchFn = createServerFn({ method: "GET" })
 				category: data.category,
 				timeRange: data.timeRange,
 			});
-			return result;
+			return { success: true, data: result };
 		} catch (error) {
 			console.error("Search failed:", error);
-			throw error;
+			return {
+				success: false,
+				error: error instanceof Error ? error.message : "Unknown error",
+			};
 		}
 	});
