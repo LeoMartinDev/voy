@@ -92,9 +92,7 @@ function SettingsLayout() {
 	const [userSettings, setUserSettings] =
 		useState<UserSettings>(initialUserSettings);
 	const [instanceConfig, setInstanceConfig] = useState<InstanceConfig | null>(
-		initialInstanceConfig ?? {
-			mistralApiKey: undefined,
-		},
+		initialInstanceConfig ?? {},
 	);
 	const [isSaving, setIsSaving] = useState(false);
 

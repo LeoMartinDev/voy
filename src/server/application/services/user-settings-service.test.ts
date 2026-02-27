@@ -43,7 +43,6 @@ describe("UserSettingsService", () => {
 				safeSearch: "strict",
 				openInNewTab: false,
 				theme: "dark",
-				enableAiSummary: true,
 				language: "en",
 			};
 			store.set("user-1", savedSettings);
@@ -59,7 +58,6 @@ describe("UserSettingsService", () => {
 				safeSearch: "moderate",
 				openInNewTab: true,
 				theme: "light",
-				enableAiSummary: false,
 				language: "fr",
 			};
 			store.set("user-1", savedSettings);
@@ -77,7 +75,6 @@ describe("UserSettingsService", () => {
 				safeSearch: "strict",
 				openInNewTab: false,
 				theme: "dark",
-				enableAiSummary: true,
 				language: "en",
 			});
 
@@ -95,7 +92,6 @@ describe("UserSettingsService", () => {
 				safeSearch: "strict",
 				openInNewTab: false,
 				theme: "dark",
-				enableAiSummary: true,
 				language: "en",
 			};
 
@@ -115,7 +111,6 @@ describe("UserSettingsService", () => {
 				safeSearch: "off",
 				openInNewTab: true,
 				theme: "system",
-				enableAiSummary: false,
 				language: "en",
 			});
 
@@ -123,7 +118,6 @@ describe("UserSettingsService", () => {
 				safeSearch: "strict",
 				openInNewTab: false,
 				theme: "dark",
-				enableAiSummary: true,
 				language: "fr",
 			};
 

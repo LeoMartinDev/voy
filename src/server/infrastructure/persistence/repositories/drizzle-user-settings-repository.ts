@@ -31,7 +31,6 @@ export function makeDrizzleUserSettingsRepository({
 				safeSearch: result[0].safeSearch as UserSettings["safeSearch"],
 				openInNewTab: result[0].openInNewTab,
 				theme: result[0].theme as UserSettings["theme"],
-				enableAiSummary: result[0].enableAiSummary,
 				language: result[0].language as UserSettings["language"],
 			};
 		},
@@ -58,7 +57,6 @@ export function makeDrizzleUserSettingsRepository({
 						safeSearch: settings.safeSearch,
 						openInNewTab: settings.openInNewTab,
 						theme: settings.theme,
-						enableAiSummary: settings.enableAiSummary,
 						language: settings.language,
 						updatedAt: now,
 					})
@@ -69,7 +67,6 @@ export function makeDrizzleUserSettingsRepository({
 					safeSearch: settings.safeSearch,
 					openInNewTab: settings.openInNewTab,
 					theme: settings.theme,
-					enableAiSummary: settings.enableAiSummary,
 					language: settings.language,
 					updatedAt: now,
 				});

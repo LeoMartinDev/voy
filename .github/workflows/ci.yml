@@ -19,7 +19,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Lint and Format Check
-        run: bun run ci
+        run: bun biome ci
 
       - name: Build
         run: bun run build

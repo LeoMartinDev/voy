@@ -12,13 +12,13 @@
     "lint": "biome lint",
     "check": "biome check",
     "typecheck": "bun --bun tsc --noEmit",
-    "ci": "biome ci && bun run typecheck",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "bun --bun run ./scripts/migrate.ts",
     "db:push": "drizzle-kit push",
     "db:pull": "drizzle-kit pull",
     "db:studio": "drizzle-kit studio",
-    "db:reset": "bun --bun run ./scripts/reset-database.ts"
+    "db:reset": "bun --bun run ./scripts/reset-database.ts",
+    "prepare": "husky"
   },
   "dependencies": {
     "@stepperize/react": "^6.0.0",
@@ -74,6 +74,7 @@
     "@vitest/coverage-v8": "^4.0.18",
     "babel-plugin-react-compiler": "^1.0.0",
     "dotenv": "^16.0.0",
+    "husky": "^9.1.7",
     "jsdom": "^27.0.0",
     "tsx": "^4.0.0",
     "typescript": "^5.7.2",
