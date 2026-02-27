@@ -13,7 +13,6 @@ A self-hosted, privacy-first metasearch engine built on top of [SearXNG](https:/
 
 - **Private search** — queries never leave your server, aggregated from multiple search engines via SearXNG
 - **Web, Image & File search** — switch between result categories with tab-based filters
-- **AI Summaries** (optional) — streaming AI-generated summaries of top results powered by Mistral, with inline citations
 - **Autocomplete** — real-time search suggestions as you type
 - **Authentication** — email/password login with admin and user roles
 - **Per-user settings** — theme (light/dark/system), safe search level, link behavior, AI toggle
@@ -181,15 +180,6 @@ Navigate to your `SITE_URL`. On first launch, the setup wizard will guide you th
 | `INSTANCE_NAME`      | No       | `Voy`    | Display name shown in the UI   |
 | `DATABASE_URL`       | No       | `dev.db` | SQLite database file path      |
 | `PORT`               | No       | `3000`   | HTTP server port               |
-
-### AI Summaries (Optional)
-
-To enable AI-powered search summaries:
-
-1. Get a [Mistral API key](https://console.mistral.ai/)
-2. Log in as admin and go to **Settings > Server**
-3. Enter your Mistral API key
-4. Users can individually toggle AI summaries in **Settings > AI**
 
 ## API
 
