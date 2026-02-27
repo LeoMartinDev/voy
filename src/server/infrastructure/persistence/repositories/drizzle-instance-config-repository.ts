@@ -27,7 +27,7 @@ export function makeDrizzleInstanceConfigRepository({
 			return {};
 		},
 
-		async save({ config }: { config: InstanceConfig }): Promise<void> {
+		async save(_: { config: InstanceConfig }): Promise<void> {
 			const now = new Date();
 
 			const existing = await db

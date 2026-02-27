@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { InstanceConfig } from "@/server/domain/value-objects";
 import * as schema from "@/server/infrastructure/persistence/drizzle/schema";
-import { makeDrizzleInstanceConfigRepository } from "./drizzle-instance-config-repository";
 import { createTestDb } from "@/server/test-utils";
+import { makeDrizzleInstanceConfigRepository } from "./drizzle-instance-config-repository";
 
 describe("DrizzleInstanceConfigRepository", () => {
 	let db: ReturnType<typeof createTestDb>;
@@ -14,8 +14,8 @@ describe("DrizzleInstanceConfigRepository", () => {
 	});
 
 	afterEach(() => {
-		// No need to close in-memory db explicitly if createTestDb doesn't expose it, 
-		// but garbage collection will handle it. 
+		// No need to close in-memory db explicitly if createTestDb doesn't expose it,
+		// but garbage collection will handle it.
 		// If we need to clear tables, we can do it here.
 	});
 
