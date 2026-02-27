@@ -24,9 +24,7 @@ export function makeDrizzleInstanceConfigRepository({
 				return null;
 			}
 
-			return {
-				mistralApiKey: result[0].mistralApiKey ?? undefined,
-			};
+			return {};
 		},
 
 		async save({ config }: { config: InstanceConfig }): Promise<void> {
@@ -42,14 +40,12 @@ export function makeDrizzleInstanceConfigRepository({
 				await db
 					.update(instanceConfig)
 					.set({
-						mistralApiKey: config.mistralApiKey ?? null,
 						updatedAt: now,
 					})
 					.where(eq(instanceConfig.id, CONFIG_ID));
 			} else {
 				await db.insert(instanceConfig).values({
 					id: CONFIG_ID,
-					mistralApiKey: config.mistralApiKey ?? null,
 					updatedAt: now,
 				});
 			}

@@ -33,7 +33,6 @@ describe("DrizzleUserSettingsRepository", () => {
 			safeSearch: "strict" as const,
 			openInNewTab: true,
 			theme: "dark" as const,
-			enableAiSummary: true,
 			language: "en" as const,
 		};
 
@@ -81,7 +80,6 @@ describe("DrizzleUserSettingsRepository", () => {
 			safeSearch: "off" as const,
 			openInNewTab: true,
 			theme: "dark" as const,
-			enableAiSummary: true,
 			language: "fr" as const,
 		};
 
