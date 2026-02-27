@@ -1,21 +1,10 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import {
-	Info,
-	Key,
-	Palette,
-	Search,
-	Server,
-	Settings,
-	Shield,
-	Sparkles,
-} from "lucide-react";
+import { Info, Key, Palette, Search, Settings, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export type SettingsSection =
-	| "server"
 	| "api"
 	| "general"
-	| "ai"
 	| "appearance"
 	| "search"
 	| "privacy"
@@ -30,15 +19,7 @@ const adminNavItems: {
 	label: string;
 	icon: React.ComponentType<{ className?: string }>;
 	route: string;
-}[] = [
-	{
-		id: "server",
-		label: "settings.server",
-		icon: Server,
-		route: "/settings/server",
-	},
-	{ id: "api", label: "settings.api", icon: Key, route: "/settings/api" },
-];
+}[] = [{ id: "api", label: "settings.api", icon: Key, route: "/settings/api" }];
 
 const userNavItems: {
 	id: SettingsSection;
@@ -52,7 +33,6 @@ const userNavItems: {
 		icon: Settings,
 		route: "/settings/general",
 	},
-	{ id: "ai", label: "settings.ai", icon: Sparkles, route: "/settings/ai" },
 	{
 		id: "appearance",
 		label: "settings.appearance",

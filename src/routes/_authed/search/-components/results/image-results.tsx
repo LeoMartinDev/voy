@@ -1,6 +1,7 @@
 "use client";
 
 import { ExternalLink, ImageIcon, Maximize2 } from "lucide-react";
+import { useState } from "react";
 import { useLinkTarget } from "@/client/hooks/use-link-target";
 import type { ImageResultEntry } from "@/server/domain/value-objects";
 import { ResultsHeader } from "./results-header";
@@ -18,10 +19,10 @@ interface ImageCardProps {
 		target?: "_blank";
 		rel?: string;
 	};
-	index: number;
 }
 
-function ImageCard({ result, linkTargetProps, index }: ImageCardProps) {
+function ImageCard({ result, linkTargetProps }: ImageCardProps) {
+	const [isLoading, setIsLoading] = useState(true);
 	const hostname = (() => {
 		try {
 			return new URL(result.url).hostname;
@@ -35,19 +36,18 @@ function ImageCard({ result, linkTargetProps, index }: ImageCardProps) {
 			href={result.imageSrc || result.url}
 			{...linkTargetProps}
 			className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-muted/30 ring-1 ring-border/30 transition-all duration-500 hover:shadow-2xl hover:shadow-foreground/10"
-			style={{
-				animationDelay: `${index * 30}ms`,
-			}}
 		>
 			<img
-				src={result.thumbnail || result.imageSrc || undefined}
+				src={result.thumbnail || result.imageSrc || "/placeholder.svg"}
 				alt={result.title}
 				loading="lazy"
 				decoding="async"
+				onLoad={() => setIsLoading(false)}
 				onError={(e) => {
+					setIsLoading(false);
 					e.currentTarget.src = "/placeholder.svg";
 				}}
-				className="h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-110"
+				className={`h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-110 ${isLoading ? "opacity-0" : "opacity-100"}`}
 			/>
 
 			<div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
@@ -148,7 +148,6 @@ export function ImageResults({
 						key={`${i}-${result.url}`}
 						result={result}
 						linkTargetProps={linkTargetProps}
-						index={i}
 					/>
 				))}
 			</div>

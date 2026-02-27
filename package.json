@@ -20,7 +20,6 @@
     "db:reset": "bun --bun run ./scripts/reset-database.ts"
   },
   "dependencies": {
-    "@ai-sdk/mistral": "^3.0.20",
     "@stepperize/react": "^6.0.0",
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/react-devtools": "^0.7.0",
@@ -36,7 +35,6 @@
     "@tanstack/router-plugin": "^1.132.0",
     "@tanstack/store": "^0.8.0",
     "@tanstack/zod-adapter": "^1.159.5",
-    "ai": "^6.0.86",
     "better-auth": "^1.4.12",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

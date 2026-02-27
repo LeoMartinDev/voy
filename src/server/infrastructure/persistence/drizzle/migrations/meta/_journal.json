@@ -8,6 +8,13 @@
 			"when": 1771879459505,
 			"tag": "0000_material_reptil",
 			"breakpoints": true
+		},
+		{
+			"idx": 1,
+			"version": "6",
+			"when": 1772174985749,
+			"tag": "0001_damp_valkyrie",
+			"breakpoints": true
 		}
 	]
 }

@@ -21,13 +21,11 @@ import { Route as AuthedSettingsRouteImport } from './routes/_authed/settings'
 import { Route as AuthedSettingsIndexRouteImport } from './routes/_authed/settings/index'
 import { Route as AuthedSearchIndexRouteImport } from './routes/_authed/search/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as AuthedSettingsServerRouteImport } from './routes/_authed/settings/server'
 import { Route as AuthedSettingsSearchRouteImport } from './routes/_authed/settings/search'
 import { Route as AuthedSettingsPrivacyRouteImport } from './routes/_authed/settings/privacy'
 import { Route as AuthedSettingsGeneralRouteImport } from './routes/_authed/settings/general'
 import { Route as AuthedSettingsAppearanceRouteImport } from './routes/_authed/settings/appearance'
 import { Route as AuthedSettingsApiRouteImport } from './routes/_authed/settings/api'
-import { Route as AuthedSettingsAiRouteImport } from './routes/_authed/settings/ai'
 import { Route as AuthedSettingsAboutRouteImport } from './routes/_authed/settings/about'
 
 const SetupRoute = SetupRouteImport.update({
@@ -89,11 +87,6 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthedSettingsServerRoute = AuthedSettingsServerRouteImport.update({
-  id: '/server',
-  path: '/server',
-  getParentRoute: () => AuthedSettingsRoute,
-} as any)
 const AuthedSettingsSearchRoute = AuthedSettingsSearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -120,11 +113,6 @@ const AuthedSettingsApiRoute = AuthedSettingsApiRouteImport.update({
   path: '/api',
   getParentRoute: () => AuthedSettingsRoute,
 } as any)
-const AuthedSettingsAiRoute = AuthedSettingsAiRouteImport.update({
-  id: '/ai',
-  path: '/ai',
-  getParentRoute: () => AuthedSettingsRoute,
-} as any)
 const AuthedSettingsAboutRoute = AuthedSettingsAboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -141,13 +129,11 @@ export interface FileRoutesByFullPath {
   '/api/search': typeof ApiSearchRoute
   '/api/suggest': typeof ApiSuggestRoute
   '/settings/about': typeof AuthedSettingsAboutRoute
-  '/settings/ai': typeof AuthedSettingsAiRoute
   '/settings/api': typeof AuthedSettingsApiRoute
   '/settings/appearance': typeof AuthedSettingsAppearanceRoute
   '/settings/general': typeof AuthedSettingsGeneralRoute
   '/settings/privacy': typeof AuthedSettingsPrivacyRoute
   '/settings/search': typeof AuthedSettingsSearchRoute
-  '/settings/server': typeof AuthedSettingsServerRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/search/': typeof AuthedSearchIndexRoute
   '/settings/': typeof AuthedSettingsIndexRoute
@@ -161,13 +147,11 @@ export interface FileRoutesByTo {
   '/api/suggest': typeof ApiSuggestRoute
   '/': typeof AuthedIndexRoute
   '/settings/about': typeof AuthedSettingsAboutRoute
-  '/settings/ai': typeof AuthedSettingsAiRoute
   '/settings/api': typeof AuthedSettingsApiRoute
   '/settings/appearance': typeof AuthedSettingsAppearanceRoute
   '/settings/general': typeof AuthedSettingsGeneralRoute
   '/settings/privacy': typeof AuthedSettingsPrivacyRoute
   '/settings/search': typeof AuthedSettingsSearchRoute
-  '/settings/server': typeof AuthedSettingsServerRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/search': typeof AuthedSearchIndexRoute
   '/settings': typeof AuthedSettingsIndexRoute
@@ -184,13 +168,11 @@ export interface FileRoutesById {
   '/api/suggest': typeof ApiSuggestRoute
   '/_authed/': typeof AuthedIndexRoute
   '/_authed/settings/about': typeof AuthedSettingsAboutRoute
-  '/_authed/settings/ai': typeof AuthedSettingsAiRoute
   '/_authed/settings/api': typeof AuthedSettingsApiRoute
   '/_authed/settings/appearance': typeof AuthedSettingsAppearanceRoute
   '/_authed/settings/general': typeof AuthedSettingsGeneralRoute
   '/_authed/settings/privacy': typeof AuthedSettingsPrivacyRoute
   '/_authed/settings/search': typeof AuthedSettingsSearchRoute
-  '/_authed/settings/server': typeof AuthedSettingsServerRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_authed/search/': typeof AuthedSearchIndexRoute
   '/_authed/settings/': typeof AuthedSettingsIndexRoute
@@ -207,13 +189,11 @@ export interface FileRouteTypes {
     | '/api/search'
     | '/api/suggest'
     | '/settings/about'
-    | '/settings/ai'
     | '/settings/api'
     | '/settings/appearance'
     | '/settings/general'
     | '/settings/privacy'
     | '/settings/search'
-    | '/settings/server'
     | '/api/auth/$'
     | '/search/'
     | '/settings/'
@@ -227,13 +207,11 @@ export interface FileRouteTypes {
     | '/api/suggest'
     | '/'
     | '/settings/about'
-    | '/settings/ai'
     | '/settings/api'
     | '/settings/appearance'
     | '/settings/general'
     | '/settings/privacy'
     | '/settings/search'
-    | '/settings/server'
     | '/api/auth/$'
     | '/search'
     | '/settings'
@@ -249,13 +227,11 @@ export interface FileRouteTypes {
     | '/api/suggest'
     | '/_authed/'
     | '/_authed/settings/about'
-    | '/_authed/settings/ai'
     | '/_authed/settings/api'
     | '/_authed/settings/appearance'
     | '/_authed/settings/general'
     | '/_authed/settings/privacy'
     | '/_authed/settings/search'
-    | '/_authed/settings/server'
     | '/api/auth/$'
     | '/_authed/search/'
     | '/_authed/settings/'
@@ -358,13 +334,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authed/settings/server': {
-      id: '/_authed/settings/server'
-      path: '/server'
-      fullPath: '/settings/server'
-      preLoaderRoute: typeof AuthedSettingsServerRouteImport
-      parentRoute: typeof AuthedSettingsRoute
-    }
     '/_authed/settings/search': {
       id: '/_authed/settings/search'
       path: '/search'
@@ -400,13 +369,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedSettingsApiRouteImport
       parentRoute: typeof AuthedSettingsRoute
     }
-    '/_authed/settings/ai': {
-      id: '/_authed/settings/ai'
-      path: '/ai'
-      fullPath: '/settings/ai'
-      preLoaderRoute: typeof AuthedSettingsAiRouteImport
-      parentRoute: typeof AuthedSettingsRoute
-    }
     '/_authed/settings/about': {
       id: '/_authed/settings/about'
       path: '/about'
@@ -419,25 +381,21 @@ declare module '@tanstack/react-router' {
 
 interface AuthedSettingsRouteChildren {
   AuthedSettingsAboutRoute: typeof AuthedSettingsAboutRoute
-  AuthedSettingsAiRoute: typeof AuthedSettingsAiRoute
   AuthedSettingsApiRoute: typeof AuthedSettingsApiRoute
   AuthedSettingsAppearanceRoute: typeof AuthedSettingsAppearanceRoute
   AuthedSettingsGeneralRoute: typeof AuthedSettingsGeneralRoute
   AuthedSettingsPrivacyRoute: typeof AuthedSettingsPrivacyRoute
   AuthedSettingsSearchRoute: typeof AuthedSettingsSearchRoute
-  AuthedSettingsServerRoute: typeof AuthedSettingsServerRoute
   AuthedSettingsIndexRoute: typeof AuthedSettingsIndexRoute
 }
 
 const AuthedSettingsRouteChildren: AuthedSettingsRouteChildren = {
   AuthedSettingsAboutRoute: AuthedSettingsAboutRoute,
-  AuthedSettingsAiRoute: AuthedSettingsAiRoute,
   AuthedSettingsApiRoute: AuthedSettingsApiRoute,
   AuthedSettingsAppearanceRoute: AuthedSettingsAppearanceRoute,
   AuthedSettingsGeneralRoute: AuthedSettingsGeneralRoute,
   AuthedSettingsPrivacyRoute: AuthedSettingsPrivacyRoute,
   AuthedSettingsSearchRoute: AuthedSettingsSearchRoute,
-  AuthedSettingsServerRoute: AuthedSettingsServerRoute,
   AuthedSettingsIndexRoute: AuthedSettingsIndexRoute,
 }
 

@@ -15,10 +15,6 @@ import {
 	makeDeleteApiKey,
 } from "./application/usecases/delete-api-key";
 import {
-	type GenerateSummaryUsecase,
-	makeGenerateSummaryUsecase,
-} from "./application/usecases/generate-summary";
-import {
 	type GetInstanceConfig,
 	makeGetInstanceConfigUsecase,
 } from "./application/usecases/get-instance-config";
@@ -51,7 +47,6 @@ import {
 	type ValidateApiKey,
 } from "./application/usecases/validate-api-key";
 import type {
-	AISummaryProvider,
 	ApiKeyRepository,
 	Cache,
 	InstanceConfigRepository,
@@ -65,7 +60,6 @@ import type {
 	SuggestResult,
 	UserSettings,
 } from "./domain/value-objects";
-import { makeMistralSummaryAdapter } from "./infrastructure/ai/mistral-summary.adapter";
 import { makeInMemoryCache } from "./infrastructure/cache/in-memory-cache";
 import { makeLruCache } from "./infrastructure/cache/lru-cache";
 import { makeSearXngSearchEngine } from "./infrastructure/http/searxng/search-engine";
@@ -86,7 +80,6 @@ export interface Container {
 		instanceConfigCache: Cache<InstanceConfig>;
 		searchCache: Cache<SearchResult>;
 		suggestCache: Cache<SuggestResult>;
-		aiSummaryProvider: AISummaryProvider | null;
 	};
 	services: {
 		userSettings: UserSettingsService;
@@ -99,7 +92,6 @@ export interface Container {
 		saveUserSettings: SaveUserSettings;
 		getInstanceConfig: GetInstanceConfig;
 		saveInstanceConfig: SaveInstanceConfig;
-		generateSummary: GenerateSummaryUsecase | null;
 		createApiKey: CreateApiKey;
 		deleteApiKey: DeleteApiKey;
 		listApiKeys: ListApiKeys;
@@ -138,11 +130,6 @@ export async function getContainer(): Promise<Container> {
 		cache: instanceConfigCache,
 	});
 
-	const config = await instanceConfigService.get();
-	const aiSummaryProvider = config.mistralApiKey
-		? makeMistralSummaryAdapter({ apiKey: config.mistralApiKey })
-		: null;
-
 	const search = makeSearchUsecase({ searchEngine, cache: searchCache });
 	const suggest = makeSuggestUsecase({ searchEngine, cache: suggestCache });
 	const getUserSettings = makeGetUserSettingsUsecase({
@@ -157,9 +144,6 @@ export async function getContainer(): Promise<Container> {
 	const saveInstanceConfig = makeSaveInstanceConfigUsecase({
 		service: instanceConfigService,
 	});
-	const generateSummary = aiSummaryProvider
-		? makeGenerateSummaryUsecase({ aiSummaryProvider })
-		: null;
 
 	const createApiKey = makeCreateApiKey({ apiKeyRepository, userRepository });
 	const deleteApiKey = makeDeleteApiKey({ apiKeyRepository, userRepository });
@@ -177,7 +161,6 @@ export async function getContainer(): Promise<Container> {
 			instanceConfigCache,
 			searchCache,
 			suggestCache,
-			aiSummaryProvider,
 		},
 		services: {
 			userSettings: userSettingsService,
@@ -190,7 +173,6 @@ export async function getContainer(): Promise<Container> {
 			saveUserSettings,
 			getInstanceConfig,
 			saveInstanceConfig,
-			generateSummary,
 			createApiKey,
 			deleteApiKey,
 			listApiKeys,

@@ -76,7 +76,6 @@ export const verification = sqliteTable("verification", {
 
 export const instanceConfig = sqliteTable("instance_config", {
 	id: integer("id").primaryKey().default(1),
-	mistralApiKey: text("mistralApiKey"),
 	updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
 });
 
@@ -92,8 +91,5 @@ export const userSettings = sqliteTable("user_settings", {
 		.notNull(),
 	theme: text("theme").default("system").notNull(),
 	language: text("language").default("en").notNull(),
-	enableAiSummary: integer("enableAiSummary", { mode: "boolean" })
-		.default(sql`0`)
-		.notNull(),
 	updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
 });

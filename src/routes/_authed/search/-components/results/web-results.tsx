@@ -3,7 +3,6 @@ import type {
 	SearchResult,
 	WebResultEntry,
 } from "@/server/domain/value-objects";
-import { AISummary } from "../ai-summary";
 import { ResultsHeader } from "./results-header";
 
 interface WebResultsLayoutProps {
@@ -132,8 +131,6 @@ export function WebResults({
 
 	return (
 		<div className="flex flex-col gap-6 w-full max-w-3xl">
-			<AISummary query={query} results={searchResult} />
-
 			<section className="flex flex-col" aria-label="Search results">
 				<div className="px-4">
 					<ResultsHeader

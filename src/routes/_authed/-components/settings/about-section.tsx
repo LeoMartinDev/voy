@@ -107,7 +107,7 @@ export function AboutSection() {
 				</CardHeader>
 				<CardContent>
 					<a
-						href="https://github.com"
+						href="https://github.com/LeoMartinDev/voy"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="flex items-center justify-between rounded-lg p-2 -mx-2 transition-colors hover:bg-muted/50"
