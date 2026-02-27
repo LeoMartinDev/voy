@@ -52,12 +52,12 @@ function ResultCard({
 				{...linkTargetProps}
 				className="flex flex-col gap-1 outline-none focus-visible:ring-2 focus-visible:ring-primary/20 rounded-lg"
 			>
-				<div className="flex items-center gap-2 text-xs text-muted-foreground mb-0.5">
-					<div className="relative flex h-4 w-4 items-center justify-center overflow-hidden rounded-full bg-muted/50 ring-1 ring-border/40 shrink-0">
+				<div className="flex items-center gap-3 text-xs text-muted-foreground mb-0.5">
+					<div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-muted/50 ring-1 ring-border/40 shrink-0">
 						<img
 							src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=64`}
 							alt=""
-							className="h-2.5 w-2.5 object-contain opacity-85"
+							className="h-5 w-5 object-contain opacity-85"
 							onError={(e) => {
 								e.currentTarget.style.display = "none";
 								e.currentTarget.parentElement?.classList.add("bg-primary/5");
@@ -97,8 +97,8 @@ export function WebResultsSkeleton() {
 					>
 						<div className="flex flex-col gap-1">
 							{/* Icon + URL */}
-							<div className="flex items-center gap-2">
-								<div className="h-4 w-4 rounded-full bg-muted animate-pulse" />
+							<div className="flex items-center gap-3">
+								<div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
 								<div className="h-3 w-32 rounded bg-muted/60 animate-pulse" />
 							</div>
 
