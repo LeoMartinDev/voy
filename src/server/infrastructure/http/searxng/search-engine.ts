@@ -27,8 +27,6 @@ const resolveImageUrl = (
 	return `${config.searxng.url}${withLeadingSlash}`;
 };
 
-const ParsedUrlSchema = z.array(z.string().nullable()).nullable().optional();
-
 const stringToDateSchema = z
 	.string()
 	.nullable()
@@ -42,14 +40,14 @@ const stringToDateSchema = z
 export const SearXNGResultSchema = z.object({
 	title: z.string(),
 	url: z.string(),
-	content: z.string().nullable().optional(),
+	content: z.string().nullish(),
 	engine: z.string(),
 	engines: z.array(z.string()),
 	positions: z.array(z.number()),
 	score: z.number(),
 	category: z.string(),
 	template: z.string(),
-	parsed_url: ParsedUrlSchema,
+	parsed_url: z.array(z.string().nullable()).nullish(),
 	publishedDate: stringToDateSchema,
 	pubdate: stringToDateSchema,
 	thumbnail: z.string().nullable().optional(),
