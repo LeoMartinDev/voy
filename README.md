@@ -265,9 +265,8 @@ All layers are wired via a lazy singleton DI container (`src/server/container.ts
 The production image is a multi-stage build:
 
 1. **base** — install locked dependencies
-2. **dev** — development image with hot reload
-3. **builder** — generates migrations and builds the app
-4. **runner** — minimal production image, runs as non-root user
+2. **builder** — generates migrations and builds the app
+3. **runner** — minimal production image, runs as non-root user
 
 The image is automatically built and pushed to `ghcr.io/LeoMartinDev/voy:latest` on every push to `main`.
 
