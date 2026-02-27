@@ -12,6 +12,7 @@
     "lint": "biome lint",
     "check": "biome check",
     "typecheck": "bun --bun tsc --noEmit",
+    "ci": "biome ci && bun run typecheck",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "bun --bun run ./scripts/migrate.ts",
     "db:push": "drizzle-kit push",
