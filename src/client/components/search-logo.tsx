@@ -1,7 +1,6 @@
 "use client";
 
 import { getRouteApi } from "@tanstack/react-router";
-import { Shield } from "lucide-react";
 
 const rootRoute = getRouteApi("__root__");
 
@@ -16,20 +15,21 @@ export function SearchLogo({ size = "lg" }: SearchLogoProps) {
 		<div className="flex items-center gap-3 group/logo select-none">
 			<div
 				className={`
-					relative flex items-center justify-center rounded-xl
+					relative flex items-center justify-center rounded-xl overflow-hidden
 					bg-primary/5 ring-1 ring-primary/10
 					transition-all duration-500 ease-out
 					group-hover/logo:bg-primary/10 group-hover/logo:ring-primary/20 group-hover/logo:scale-105
 					${size === "lg" ? "h-11 w-11" : "h-9 w-9"}
 				`}
 			>
-				<Shield
+				<img
+					src="/logo.jpg"
+					alt="Logo"
 					className={`
-						text-primary transition-all duration-500 ease-out
-						group-hover/logo:rotate-12 group-hover/logo:text-primary
-						${size === "lg" ? "h-5 w-5" : "h-4 w-4"}
+						h-full w-full object-cover
+						transition-all duration-500 ease-out
+						group-hover/logo:rotate-12 group-hover/logo:scale-110
 					`}
-					strokeWidth={2.5}
 				/>
 			</div>
 
