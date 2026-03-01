@@ -5,36 +5,45 @@
 [![CI](https://github.com/leomartindev/voy/actions/workflows/ci.yml/badge.svg)](https://github.com/leomartindev/voy/actions/workflows/ci.yml)
 [![Docker](https://github.com/leomartindev/voy/actions/workflows/docker-build-push.yml/badge.svg)](https://github.com/leomartindev/voy/actions/workflows/docker-build-push.yml)
 
-A self-hosted, privacy-first metasearch engine built on top of [SearXNG](https://searxng.github.io/searxng/). All searches are proxied through your own server — no tracking, no data sent to third parties.
+A self-hosted, privacy-first metasearch engine built on top of
+[SearXNG](https://searxng.github.io/searxng/). All searches are proxied through
+your own server — no tracking, no data sent to third parties.
 
 ![Voy Screenshot](./assets/voy.gif)
 
 ## Features
 
-- **Private search** — queries never leave your server, aggregated from multiple search engines via SearXNG
-- **Web, Image & File search** — switch between result categories with tab-based filters
+- **Private search** — queries never leave your server, aggregated from multiple
+  search engines via SearXNG
+- **Web, Image & File search** — switch between result categories with tab-based
+  filters
 - **Autocomplete** — real-time search suggestions as you type
 - **Authentication** — email/password login with admin and user roles
-- **Per-user settings** — theme (light/dark/system), safe search level, link behavior, AI toggle
+- **Per-user settings** — theme (light/dark/system), safe search level, link
+  behavior, AI toggle
 - **OpenSearch support** — add Voy as a search provider in your browser
 - **Keyboard shortcuts** — `/` to focus search, `Esc` to clear
 - **First-run setup wizard** — guided configuration on first launch
 
 ## Tech Stack
 
-**Frontend:** React 19, TanStack Start/Router/Query, Tailwind CSS v4, shadcn/ui, Radix UI
+**Frontend:** React 19, TanStack Start/Router/Query, Tailwind CSS v4, shadcn/ui,
+Radix UI
 
-**Backend:** Bun, TanStack Start server functions, Better Auth, Drizzle ORM, SQLite
+**Backend:** Bun, TanStack Start server functions, Better Auth, Drizzle ORM,
+SQLite
 
 **Infrastructure:** SearXNG, Valkey (Redis-compatible), Docker
 
 ## Deployment
 
-Deploy Voy on any server without cloning the repository — the image is pulled directly from GHCR.
+Deploy Voy on any server without cloning the repository — the image is pulled
+directly from GHCR.
 
 ### Prerequisites
 
-- [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
+- [Docker](https://docs.docker.com/get-docker/) and
+  [Docker Compose](https://docs.docker.com/compose/install/)
 
 ### 1. Create a `compose.yml`
 
@@ -79,6 +88,9 @@ services:
   searxng:
     image: searxng/searxng:latest
     restart: unless-stopped
+    configs:
+      - source: searxng_settings
+        target: /etc/searxng/settings.yml
     environment:
       SEARXNG_SECRET: ${SEARXNG_SECRET}
       UWSGI_WORKERS: 2
@@ -142,6 +154,10 @@ networks:
     driver: bridge
 ```
 
+> Note: Voy queries SearXNG using `format=json`. If the `searxng_settings`
+> config isn't mounted (or `search.formats` doesn't include `json`), SearXNG
+> will respond with `403 Forbidden`.
+
 ### 2. Create a `.env` file
 
 ```env
@@ -159,7 +175,8 @@ SITE_URL=https://your-domain.com
 docker compose up -d
 ```
 
-Navigate to your `SITE_URL`. On first launch, the setup wizard will guide you through configuring safe search and creating your admin account.
+Navigate to your `SITE_URL`. On first launch, the setup wizard will guide you
+through configuring safe search and creating your admin account.
 
 ### 4. Set as default search engine
 
@@ -187,8 +204,8 @@ Voy provides a REST API for programmatically accessing search results.
 
 ### Authentication
 
-API access requires an API key, which must be included in the query parameters as `key`.
-Only administrators can generate API keys via **Settings > API Keys**.
+API access requires an API key, which must be included in the query parameters
+as `key`. Only administrators can generate API keys via **Settings > API Keys**.
 
 **Example:**
 
@@ -229,7 +246,8 @@ cp .env.example .env
 docker compose up
 ```
 
-This starts SearXNG and Valkey, mounts the source code, and enables hot reload. Open [http://localhost:3000](http://localhost:3000).
+This starts SearXNG and Valkey, mounts the source code, and enables hot reload.
+Open [http://localhost:3000](http://localhost:3000).
 
 ### Available Scripts
 
@@ -258,7 +276,8 @@ src/server/
 └── infrastructure/  # Adapters — SearXNG, Mistral, Drizzle, Better Auth
 ```
 
-All layers are wired via a lazy singleton DI container (`src/server/container.ts`).
+All layers are wired via a lazy singleton DI container
+(`src/server/container.ts`).
 
 ## Docker
 
@@ -268,11 +287,13 @@ The production image is a multi-stage build:
 2. **builder** — generates migrations and builds the app
 3. **runner** — minimal production image, runs as non-root user
 
-The image is automatically built and pushed to `ghcr.io/LeoMartinDev/voy:latest` on every push to `main`.
+The image is automatically built and pushed to `ghcr.io/LeoMartinDev/voy:latest`
+on every push to `main`.
 
 ## Contributing
 
-Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a pull request.
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before
+submitting a pull request.
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/my-feature`)
