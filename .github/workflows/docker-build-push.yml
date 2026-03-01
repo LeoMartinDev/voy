@@ -1,8 +1,8 @@
 name: Docker Build and Push
 
 on:
-  push:
-    branches: [main]
+  release:
+    types: [published]
 
 env:
   REGISTRY: ghcr.io
@@ -35,6 +35,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
+            type=raw,value=${{ github.event.release.tag_name }}
             type=sha,prefix=,suffix=,format=short
             type=raw,value=latest
 
