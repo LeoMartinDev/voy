@@ -149,5 +149,11 @@ export const fr = {
 					"Sélectionnez le niveau de filtrage de contenu que vous préférez.",
 			},
 		},
+		validation: {
+			required: "Ce champ est requis",
+			invalidEmail: "Email invalide",
+			minLength: "Doit contenir au moins {{count}} caractères",
+			invalid: "Valeur invalide",
+		},
 	},
 };

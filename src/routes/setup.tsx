@@ -3,8 +3,9 @@ import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Check } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { normalizeLanguageCode } from "@/client/languages";
 import { cn } from "@/client/utils";
 import { SafeSearch } from "@/server/domain/value-objects";
 import {
@@ -14,7 +15,6 @@ import {
 import {
 	AdminStep,
 	adminFormOpts,
-	createStep2Schema,
 	LanguageStep,
 	languageFormOpts,
 	SafeSearchStep,
@@ -63,11 +63,9 @@ function SetupPage() {
 	const [error, setError] = useState<string | null>(null);
 	const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 	const [mounted, setMounted] = useState(false);
-	const normalizedLanguage = (
-		i18n.resolvedLanguage ||
-		i18n.language ||
-		"en"
-	).split("-")[0] as "en" | "fr";
+	const normalizedLanguage = normalizeLanguageCode(
+		i18n.resolvedLanguage || i18n.language,
+	);
 
 	useEffect(() => {
 		setMounted(true);
@@ -80,6 +78,7 @@ function SetupPage() {
 			name: string;
 			email: string;
 			password: string;
+			language: string;
 		}) => finalizeSetupFn({ data }),
 		onSuccess: () => {
 			navigate({ to: "/", replace: true });
@@ -109,14 +108,8 @@ function SetupPage() {
 		},
 	});
 
-	const adminSchema = useMemo(() => createStep2Schema(t), [t]);
-
 	const adminForm = useSetupForm({
 		...adminFormOpts,
-		validators: {
-			...adminFormOpts.validators,
-			onChange: adminSchema,
-		},
 		onSubmit: async ({ value }) => {
 			const rawSafeSearch = safeSearchForm.state.values.safeSearch;
 
@@ -133,11 +126,18 @@ function SetupPage() {
 				name: value.name,
 				email: value.email,
 				password: value.password,
+				language: languageForm.state.values.language,
 			};
 
 			setupMutation.mutate(payload);
 		},
 	});
+
+	const handleAdminBack = () => {
+		setHasAttemptedSubmit(false);
+		adminForm.reset(adminForm.state.values, { keepDefaultValues: true });
+		stepper.navigation.prev();
+	};
 
 	return (
 		<div className="grid min-h-svh lg:grid-cols-2">
@@ -252,7 +252,7 @@ function SetupPage() {
 									<AdminStep
 										hasAttemptedSubmit={hasAttemptedSubmit}
 										isPending={setupMutation.isPending}
-										onBack={() => stepper.navigation.prev()}
+										onBack={handleAdminBack}
 										onSubmit={() => {
 											setHasAttemptedSubmit(true);
 											adminForm.handleSubmit();

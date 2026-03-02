@@ -145,5 +145,11 @@ export const en = {
 				description: "Select the level of content filtering you prefer.",
 			},
 		},
+		validation: {
+			required: "This field is required",
+			invalidEmail: "Invalid email",
+			minLength: "Must be at least {{count}} characters",
+			invalid: "Invalid value",
+		},
 	},
 };

@@ -5,10 +5,15 @@ import { z } from "zod";
 import { Button } from "@/client/components/ui/button";
 import { Label } from "@/client/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/client/components/ui/radio-group";
+import {
+	type LanguageCode,
+	languageCodeTuple,
+	languageOptions,
+} from "@/client/languages";
 import { useSetupTypedFormContext } from "./setup-form";
 
 export const stepLanguageSchema = z.object({
-	language: z.enum(["en", "fr"]),
+	language: z.enum(languageCodeTuple),
 });
 
 export type LanguageStepFormValues = z.infer<typeof stepLanguageSchema>;
@@ -30,18 +35,7 @@ export function LanguageStep({ onSubmit }: LanguageStepProps) {
 	const form = useSetupTypedFormContext(languageFormOpts);
 	const { t, i18n } = useTranslation();
 
-	const languageOptions = [
-		{
-			value: "en",
-			label: t("languages.en"),
-		},
-		{
-			value: "fr",
-			label: t("languages.fr"),
-		},
-	];
-
-	const handleLanguageChange = (value: string) => {
+	const handleLanguageChange = (value: LanguageCode) => {
 		i18n.changeLanguage(value);
 	};
 
@@ -60,25 +54,25 @@ export function LanguageStep({ onSubmit }: LanguageStepProps) {
 							value={field.state.value}
 							onValueChange={(value) => {
 								field.handleChange(value as LanguageStepFormValues["language"]);
-								handleLanguageChange(value);
+								handleLanguageChange(value as LanguageCode);
 							}}
 							className="gap-3"
 						>
 							{languageOptions.map((option) => (
 								<Label
-									key={option.value}
-									htmlFor={option.value}
+									key={option.code}
+									htmlFor={option.code}
 									className="flex items-start gap-3 rounded-lg border p-4 cursor-pointer hover:bg-accent/50 transition-colors [&:has(:checked)]:border-primary [&:has(:checked)]:bg-primary/5"
 								>
 									<RadioGroupItem
-										value={option.value}
-										id={option.value}
+										value={option.code}
+										id={option.code}
 										className="mt-0.5"
 									/>
 									<div className="flex-1 space-y-1">
 										<div className="flex items-center gap-2">
 											<Languages className="h-4 w-4 text-muted-foreground" />
-											<span className="font-medium">{option.label}</span>
+											<span className="font-medium">{t(option.labelKey)}</span>
 										</div>
 									</div>
 								</Label>

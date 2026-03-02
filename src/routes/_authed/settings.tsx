@@ -6,6 +6,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/client/components/ui/button";
+import { normalizeLanguageCode } from "@/client/languages";
 import { sessionQueryOptions } from "@/routes/_authed";
 import {
 	getInstanceConfig,
@@ -150,11 +151,9 @@ function SettingsLayout() {
 				});
 
 				// Apply language change if needed
-				const currentLng = (
-					i18n.resolvedLanguage ||
-					i18n.language ||
-					"en"
-				).split("-")[0];
+				const currentLng = normalizeLanguageCode(
+					i18n.resolvedLanguage || i18n.language,
+				);
 				if (userSettings.language !== currentLng) {
 					i18n.changeLanguage(userSettings.language);
 				}

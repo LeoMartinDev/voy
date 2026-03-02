@@ -2,8 +2,7 @@ export {
 	type AdminFormValues,
 	AdminStep,
 	adminFormOpts,
-	createStep2Schema,
-	step2Schema,
+	adminSchema,
 } from "./admin-step";
 export {
 	LanguageStep,

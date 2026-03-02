@@ -8,6 +8,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/client/components/ui/card";
+import type { LanguageCode } from "@/client/languages";
 import { LanguageSwitcher } from "@/routes/_authed/-components/settings/language-switcher";
 import { useSettingsLayout } from "@/routes/_authed/settings";
 
@@ -30,7 +31,7 @@ export function GeneralSection() {
 					<LanguageSwitcher
 						value={userSettings.language}
 						onValueChange={(val) =>
-							handleUserSettingChange("language", val as "en" | "fr")
+							handleUserSettingChange("language", val as LanguageCode)
 						}
 					/>
 				</CardContent>

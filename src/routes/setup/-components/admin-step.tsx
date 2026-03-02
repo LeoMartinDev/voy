@@ -2,37 +2,32 @@ import { formOptions } from "@tanstack/react-form";
 import { useId } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
+import i18n from "@/client/i18n";
 import { Button } from "@/client/components/ui/button";
 import { Input } from "@/client/components/ui/input";
 import { Label } from "@/client/components/ui/label";
 import { useSetupTypedFormContext } from "./setup-form";
 
-export const createStep2Schema = (t: (key: string) => string) =>
-	z
-		.object({
-			name: z.string().min(1, t("setup.admin.nameRequired")),
-			email: z.string().email(t("setup.admin.emailInvalid")),
-			password: z.string().min(8, t("setup.admin.passwordMinLength")),
-			confirmPassword: z.string(),
-		})
-		.refine((data) => data.password === data.confirmPassword, {
-			message: t("setup.admin.passwordsDoNotMatch"),
-			path: ["confirmPassword"],
-		});
-
-// Fallback schema for types or initial render
-export const step2Schema = z
+export const adminSchema = z
 	.object({
-		name: z.string().min(1),
-		email: z.string().email(),
-		password: z.string().min(8),
-		confirmPassword: z.string(),
+		name: z
+			.string()
+			.trim()
+			.min(1, { error: () => i18n.t("setup.admin.nameRequired") }),
+		email: z.email({ error: () => i18n.t("setup.admin.emailInvalid") }),
+		password: z
+			.string()
+			.min(8, { error: () => i18n.t("setup.admin.passwordMinLength") }),
+		confirmPassword: z
+			.string()
+			.min(1, { error: () => i18n.t("validation.required") }),
 	})
 	.refine((data) => data.password === data.confirmPassword, {
 		path: ["confirmPassword"],
+		error: () => i18n.t("setup.admin.passwordsDoNotMatch"),
 	});
 
-export type AdminFormValues = z.infer<typeof step2Schema>;
+export type AdminFormValues = z.infer<typeof adminSchema>;
 
 export const adminFormOpts = formOptions({
 	defaultValues: {
@@ -42,7 +37,7 @@ export const adminFormOpts = formOptions({
 		confirmPassword: "",
 	},
 	validators: {
-		onChange: step2Schema,
+		onChange: adminSchema,
 	},
 });
 
