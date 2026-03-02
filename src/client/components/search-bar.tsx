@@ -260,8 +260,8 @@ export function SearchBar({
 			<div
 				className={`
 					absolute left-0 right-0 top-full mt-2 overflow-hidden rounded-xl
-					border border-border/40 bg-background/95 backdrop-blur-2xl
-					shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)]
+					border border-border/50 bg-background/95 backdrop-blur-2xl
+					shadow-2xl dark:shadow-black/50
 					transition-all duration-200 origin-top
 					${hasItems && isFocused ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-2 scale-[0.98] pointer-events-none"}
 				`}
@@ -271,7 +271,7 @@ export function SearchBar({
 						id={listboxId}
 						role="listbox"
 						aria-label="Search suggestions"
-						className="py-1.5"
+						className="pt-1.5 pb-1.5 lg:pb-0"
 					>
 						{suggestions.length > 0 && (
 							<div className="px-1.5">

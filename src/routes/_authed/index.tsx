@@ -61,7 +61,7 @@ function HomePage() {
 
 			<main
 				id={mainSearchId}
-				className="flex flex-1 flex-col items-center justify-center px-6 pb-32 relative z-10"
+				className="flex flex-1 flex-col items-center justify-center px-6 pb-32 relative z-20"
 			>
 				<div className="flex w-full max-w-2xl flex-col items-center gap-10">
 					<div className="animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-backwards">
