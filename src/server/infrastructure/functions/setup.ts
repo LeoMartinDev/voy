@@ -6,6 +6,8 @@ import {
 	languageCodeTuple,
 	normalizeLanguageCode,
 } from "@/client/languages";
+import { defaultUserSettings, SafeSearch } from "@/server/domain/value-objects";
+import { getContainer } from "@/server/container";
 
 export const getSetupStatus = createServerFn({ method: "GET" }).handler(
 	async () => {
@@ -34,7 +36,9 @@ const finalizeSetupSchema = z.object({
 	name: z.string().min(1),
 	email: z.string().email(),
 	password: z.string().min(8),
-	safeSearch: z.string().optional(),
+	safeSearch: z
+		.enum([SafeSearch.OFF, SafeSearch.MODERATE, SafeSearch.STRICT])
+		.optional(),
 	language: z.enum(languageCodeTuple).optional(),
 });
 
@@ -61,6 +65,27 @@ const getSetupLocale = (input: FinalizeSetupInput) => {
 			: defaultLanguageCode;
 
 	return language === "fr" ? z.locales.fr() : z.locales.en();
+};
+
+const getCreatedUserId = (createdUser: unknown): string | null => {
+	if (!createdUser || typeof createdUser !== "object") {
+		return null;
+	}
+
+	const data = createdUser as {
+		user?: { id?: unknown };
+		id?: unknown;
+	};
+
+	if (typeof data.user?.id === "string" && data.user.id.length > 0) {
+		return data.user.id;
+	}
+
+	if (typeof data.id === "string" && data.id.length > 0) {
+		return data.id;
+	}
+
+	return null;
 };
 
 export const finalizeSetup = createServerFn({ method: "POST" })
@@ -94,12 +119,37 @@ export const finalizeSetup = createServerFn({ method: "POST" })
 				throw new Error("Setup already completed");
 			}
 
-			await auth.api.createUser({
+			const createdUser = await auth.api.createUser({
 				body: {
 					name: validation.data.name,
 					email: validation.data.email,
 					password: validation.data.password,
 					role: "admin",
+				},
+			});
+
+			let userId = getCreatedUserId(createdUser);
+			if (!userId) {
+				const createdAdmin = await db
+					.select({ id: user.id })
+					.from(user)
+					.where(eq(user.email, validation.data.email))
+					.limit(1);
+
+				userId = createdAdmin[0]?.id ?? null;
+			}
+
+			if (!userId) {
+				throw new Error("Unable to resolve created admin user ID");
+			}
+
+			const container = await getContainer();
+			await container.usecases.saveUserSettings({
+				userId,
+				settings: {
+					...defaultUserSettings,
+					safeSearch: validation.data.safeSearch ?? defaultUserSettings.safeSearch,
+					language: validation.data.language ?? defaultLanguageCode,
 				},
 			});
 

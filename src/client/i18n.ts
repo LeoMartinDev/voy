@@ -13,8 +13,7 @@ i18n
 			en,
 			fr,
 		},
-		lng:
-			typeof window === "undefined" ? defaultLanguageCode : undefined, // Force English on server
+		lng: typeof window === "undefined" ? defaultLanguageCode : undefined, // Force English on server
 		fallbackLng: defaultLanguageCode,
 		supportedLngs: supportedLanguageCodes,
 		load: "languageOnly",

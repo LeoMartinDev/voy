@@ -7,10 +7,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/client/components/ui/select";
-import {
-	languageOptions,
-	normalizeLanguageCode,
-} from "@/client/languages";
+import { languageOptions, normalizeLanguageCode } from "@/client/languages";
 import { authClient } from "@/server/infrastructure/auth/client";
 import {
 	getUserSettings,
@@ -62,8 +59,7 @@ export function LanguageSwitcher({
 	// Ensure we have a valid language selection, fallback to 'en'
 	// Use resolvedLanguage if available, otherwise language, otherwise 'en'
 	const currentLanguage =
-		value ||
-		normalizeLanguageCode(i18n.resolvedLanguage || i18n.language);
+		value || normalizeLanguageCode(i18n.resolvedLanguage || i18n.language);
 
 	return (
 		<div className="flex items-center gap-2">

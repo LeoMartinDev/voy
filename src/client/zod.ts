@@ -3,7 +3,9 @@ import i18n from "./i18n";
 import { normalizeLanguageCode } from "./languages";
 
 const applyZodLocale = () => {
-	const language = normalizeLanguageCode(i18n.resolvedLanguage || i18n.language);
+	const language = normalizeLanguageCode(
+		i18n.resolvedLanguage || i18n.language,
+	);
 	const locale = language === "fr" ? z.locales.fr() : z.locales.en();
 	z.config(locale);
 };
