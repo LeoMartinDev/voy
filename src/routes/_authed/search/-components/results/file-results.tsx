@@ -133,7 +133,7 @@ function FileCard({ result, index, linkTargetProps }: FileCardProps) {
 		<a
 			href={result.url}
 			{...linkTargetProps}
-			className="group flex items-start gap-4 rounded-xl border border-transparent p-4 transition-all duration-200 hover:border-border/50 hover:bg-muted/50 hover:shadow-sm"
+			className="group flex items-start gap-3 md:gap-4 rounded-xl border border-transparent p-2 md:p-4 transition-all duration-200 hover:border-border/50 hover:bg-muted/50 hover:shadow-sm"
 			style={{
 				animationDelay: `${index * 50}ms`,
 			}}
@@ -243,7 +243,7 @@ export function FileResults({
 
 	return (
 		<section className="flex flex-col gap-6" aria-label="File search results">
-			<div className="mb-4 px-4">
+			<div className="mb-4 px-1 sm:px-4">
 				<ResultsHeader
 					count={results.length}
 					query={query}
@@ -253,7 +253,7 @@ export function FileResults({
 				/>
 			</div>
 
-			<div className="flex flex-col">
+			<div className="flex flex-col gap-2 md:gap-0">
 				{results.map((result, i) => (
 					<FileCard
 						key={`${i}-${result.url}`}

@@ -195,7 +195,7 @@ export function SearchBar({
 					className={`
 						h-full w-full bg-transparent outline-none placeholder:text-muted-foreground/50
 						text-foreground transition-all duration-300
-						${isCompact ? "pl-10 pr-20 text-sm" : "pl-12 pr-24 text-base"}
+						${isCompact ? "pl-10 pr-20 text-base md:text-sm" : "pl-12 pr-24 text-base"}
 						font-normal tracking-wide
 					`}
 					aria-label="Search"

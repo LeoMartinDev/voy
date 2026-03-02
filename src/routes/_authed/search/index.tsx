@@ -235,8 +235,8 @@ function SearchPage() {
 			</a>
 
 			<header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
-				<div className="mx-auto max-w-6xl px-6 lg:px-8">
-					<div className="flex h-[72px] items-center gap-6">
+				<div className="mx-auto max-w-6xl px-3 md:px-6 lg:px-8">
+					<div className="flex h-14 md:h-[72px] items-center gap-3 md:gap-6 pt-2 md:pt-0">
 						<Link
 							to="/"
 							className="shrink-0 transition-opacity duration-200 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 rounded-xl"
@@ -255,7 +255,7 @@ function SearchPage() {
 						</div>
 					</div>
 
-					<div className="flex items-center h-10 pb-2">
+					<div className="flex items-center h-10 md:pb-2 mt-2 md:mt-0 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
 						<SearchFilters
 							active={activeCategory}
 							onChange={handleCategoryChange}
@@ -268,7 +268,7 @@ function SearchPage() {
 
 			<main
 				id={searchResultsId}
-				className="flex-1 w-full mx-auto max-w-6xl px-6 py-8 lg:px-8"
+				className="flex-1 w-full mx-auto max-w-6xl px-3 py-4 md:px-6 md:py-8 lg:px-8"
 			>
 				<div className="max-w-[800px] flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
 					<SearchErrorBoundary fallback={<SearchErrorUI />}>

@@ -42,7 +42,7 @@ function ResultCard({
 
 	return (
 		<article
-			className="group relative flex flex-col gap-1 px-4 transition-opacity duration-200"
+			className="group relative flex flex-col gap-1 px-1 sm:px-4 transition-opacity duration-200"
 			style={{
 				animationDelay: `${index * 50}ms`,
 			}}
@@ -52,12 +52,12 @@ function ResultCard({
 				{...linkTargetProps}
 				className="flex flex-col gap-1 outline-none focus-visible:ring-2 focus-visible:ring-primary/20 rounded-lg"
 			>
-				<div className="flex items-center gap-3 text-xs text-muted-foreground mb-0.5">
-					<div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-muted/50 ring-1 ring-border/40 shrink-0">
+				<div className="flex items-center gap-2.5 text-xs text-muted-foreground mb-0.5">
+					<div className="relative flex h-6 w-6 md:h-8 md:w-8 items-center justify-center overflow-hidden rounded-full bg-muted/50 ring-1 ring-border/40 shrink-0">
 						<img
 							src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=64`}
 							alt=""
-							className="h-5 w-5 object-contain opacity-85"
+							className="h-3.5 w-3.5 md:h-5 md:w-5 object-contain opacity-85"
 							onError={(e) => {
 								e.currentTarget.style.display = "none";
 								e.currentTarget.parentElement?.classList.add("bg-primary/5");
@@ -67,11 +67,11 @@ function ResultCard({
 					<span className="truncate">{displayUrl}</span>
 				</div>
 
-				<h3 className="text-xl font-normal text-blue-700 dark:text-blue-300 group-hover:underline truncate leading-tight">
+				<h3 className="text-lg md:text-xl font-normal text-blue-700 dark:text-blue-300 group-hover:underline truncate leading-tight">
 					{result.title}
 				</h3>
 
-				<p className="text-sm text-foreground/80 leading-relaxed line-clamp-2">
+				<p className="text-sm text-foreground/80 leading-relaxed line-clamp-3 md:line-clamp-2">
 					{result.content}
 				</p>
 			</a>
@@ -130,9 +130,9 @@ export function WebResults({
 	}
 
 	return (
-		<div className="flex flex-col gap-6 w-full max-w-3xl">
+		<div className="flex flex-col gap-4 md:gap-6 w-full max-w-3xl">
 			<section className="flex flex-col" aria-label="Search results">
-				<div className="px-4">
+				<div className="px-1 sm:px-4">
 					<ResultsHeader
 						count={results.length}
 						query={query}
@@ -142,7 +142,7 @@ export function WebResults({
 					/>
 				</div>
 
-				<div className="flex flex-col space-y-10">
+				<div className="flex flex-col space-y-6 md:space-y-10">
 					{results.map((result, i) => (
 						<ResultCard
 							key={`${i}-${result.url}`}

@@ -27,7 +27,7 @@ export function ResultsHeader({
 	};
 
 	return (
-		<div className="flex items-center gap-2 mb-6">
+		<div className="flex items-center gap-2 mb-4 md:mb-6">
 			<p className="text-sm text-muted-foreground">
 				<span className="font-semibold text-foreground">{count}</span>{" "}
 				{pluralLabel} for <span className="text-foreground">"{query}"</span>

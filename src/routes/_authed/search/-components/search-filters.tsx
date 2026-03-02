@@ -59,9 +59,9 @@ export function SearchFilters({
 	)?.labelKey;
 
 	return (
-		<div className="flex w-full items-center gap-8">
+		<div className="flex w-full items-center justify-between md:justify-start gap-4 md:gap-8">
 			<nav
-				className="flex items-center gap-5"
+				className="flex items-center gap-3 md:gap-5 shrink-0"
 				aria-label={t("search.filterResults")}
 			>
 				{FILTERS.map((filter) => {
@@ -76,7 +76,7 @@ export function SearchFilters({
 							onClick={() => onChange(filter.id)}
 							className={`
 								group relative flex items-center gap-1.5 py-1.5 text-[13px] font-medium transition-all
-								focus-visible:outline-none focus-visible:text-primary
+								focus-visible:outline-none focus-visible:text-primary whitespace-nowrap
 								${isActive ? "text-primary" : "text-muted-foreground/70 hover:text-foreground"}
 							`}
 						>
@@ -104,7 +104,7 @@ export function SearchFilters({
 							variant="ghost"
 							size="sm"
 							className={`
-								h-8 gap-1.5 rounded-lg px-2.5 text-[13px] font-medium transition-all hover:bg-muted/50
+								h-8 gap-1.5 rounded-lg px-2.5 text-[13px] font-medium transition-all hover:bg-muted/50 shrink-0
 								${
 									timeRange && timeRange !== TimeRange.ALL
 										? "text-primary bg-primary/5 hover:bg-primary/10"
@@ -112,13 +112,13 @@ export function SearchFilters({
 								}
 							`}
 						>
-							<Calendar className="h-3.5 w-3.5" />
-							<span>
+							<Calendar className="h-3.5 w-3.5 shrink-0" />
+							<span className="whitespace-nowrap">
 								{activeTimeRangeLabel
 									? t(activeTimeRangeLabel)
 									: t("search.anyTime")}
 							</span>
-							<ChevronDown className="h-3 w-3 opacity-40" />
+							<ChevronDown className="h-3 w-3 opacity-40 shrink-0" />
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent

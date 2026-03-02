@@ -134,13 +134,15 @@ export function ImageResults({
 
 	return (
 		<section className="flex flex-col gap-6" aria-label="Image search results">
-			<ResultsHeader
-				count={results.length}
-				query={query}
-				duration={duration}
-				cached={cached}
-				type="image"
-			/>
+			<div className="px-1 sm:px-4">
+				<ResultsHeader
+					count={results.length}
+					query={query}
+					duration={duration}
+					cached={cached}
+					type="image"
+				/>
+			</div>
 
 			<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 lg:grid-cols-4">
 				{results.map((result, i) => (
