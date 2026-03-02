@@ -5,6 +5,23 @@ import { getSetupStatus } from "@/server/infrastructure/functions/setup";
 
 const rootRoute = getRouteApi("__root__");
 
+function getSafeRedirect({
+	redirect,
+}: {
+	redirect: unknown;
+}): string | undefined {
+	if (typeof redirect !== "string") {
+		return undefined;
+	}
+
+	// Only allow in-app absolute paths.
+	if (!redirect.startsWith("/") || redirect.startsWith("//")) {
+		return undefined;
+	}
+
+	return redirect;
+}
+
 export const Route = createFileRoute("/login")({
 	loader: async () => {
 		const { setupRequired } = await getSetupStatus();
@@ -16,7 +33,7 @@ export const Route = createFileRoute("/login")({
 		return { setupComplete: true };
 	},
 	validateSearch: (search: Record<string, unknown>) => ({
-		redirect: typeof search.redirect === "string" ? search.redirect : undefined,
+		redirect: getSafeRedirect({ redirect: search.redirect }),
 	}),
 	head: () => ({
 		meta: [{ title: "Login" }],

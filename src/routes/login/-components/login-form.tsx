@@ -1,4 +1,5 @@
 import { useForm } from "@tanstack/react-form";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useId, useState } from "react";
 import { z } from "zod";
@@ -11,6 +12,7 @@ import {
 } from "@/client/components/ui/field";
 import { Input } from "@/client/components/ui/input";
 import { cn } from "@/client/utils";
+import { sessionQueryOptions } from "@/routes/_authed";
 import { authClient } from "@/server/infrastructure/auth/client";
 
 const loginSchema = z.object({
@@ -22,8 +24,21 @@ interface LoginFormProps extends React.ComponentProps<"form"> {
 	redirectTo?: string;
 }
 
+function getLoginRedirectHref({ redirectTo }: { redirectTo?: string }): string {
+	if (!redirectTo) {
+		return "/";
+	}
+
+	if (!redirectTo.startsWith("/") || redirectTo.startsWith("//")) {
+		return "/";
+	}
+
+	return redirectTo;
+}
+
 export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
 	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 	const [error, setError] = useState<string | null>(null);
 	const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 	const emailId = useId();
@@ -49,7 +64,14 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
 				return;
 			}
 
-			navigate({ to: redirectTo ?? "/", replace: true });
+			await queryClient.invalidateQueries({
+				queryKey: sessionQueryOptions.queryKey,
+			});
+
+			navigate({
+				href: getLoginRedirectHref({ redirectTo }),
+				replace: true,
+			});
 		},
 	});
 
