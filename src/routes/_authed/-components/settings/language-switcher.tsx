@@ -7,6 +7,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/client/components/ui/select";
+import { languageOptions, normalizeLanguageCode } from "@/client/languages";
 import { authClient } from "@/server/infrastructure/auth/client";
 import {
 	getUserSettings,
@@ -26,9 +27,10 @@ export function LanguageSwitcher({
 	const { data: session } = authClient.useSession();
 
 	const changeLanguage = async (lng: string) => {
+		const normalizedLng = normalizeLanguageCode(lng);
 		// Controlled mode: just bubble up the change
 		if (onValueChange) {
-			onValueChange(lng);
+			onValueChange(normalizedLng);
 			return;
 		}
 
@@ -37,7 +39,6 @@ export function LanguageSwitcher({
 			try {
 				// Fetch current settings first to merge
 				const currentSettings = await getUserSettings();
-				const normalizedLng = lng.split("-")[0] as "en" | "fr";
 
 				// Save to server first
 				await saveUserSettings({
@@ -45,22 +46,20 @@ export function LanguageSwitcher({
 				});
 
 				// Then update client state
-				i18n.changeLanguage(lng);
+				i18n.changeLanguage(normalizedLng);
 			} catch (error) {
 				console.error("Failed to save language preference:", error);
 			}
 		} else {
 			// Guest user - just change language
-			i18n.changeLanguage(lng);
+			i18n.changeLanguage(normalizedLng);
 		}
 	};
 
 	// Ensure we have a valid language selection, fallback to 'en'
 	// Use resolvedLanguage if available, otherwise language, otherwise 'en'
 	const currentLanguage =
-		value ||
-		(i18n.resolvedLanguage || i18n.language || "en").split("-")[0] ||
-		"en";
+		value || normalizeLanguageCode(i18n.resolvedLanguage || i18n.language);
 
 	return (
 		<div className="flex items-center gap-2">
@@ -70,8 +69,11 @@ export function LanguageSwitcher({
 					<SelectValue placeholder={t("settings.language")} />
 				</SelectTrigger>
 				<SelectContent>
-					<SelectItem value="en">{t("languages.en")}</SelectItem>
-					<SelectItem value="fr">{t("languages.fr")}</SelectItem>
+					{languageOptions.map((option) => (
+						<SelectItem key={option.code} value={option.code}>
+							{t(option.labelKey)}
+						</SelectItem>
+					))}
 				</SelectContent>
 			</Select>
 		</div>

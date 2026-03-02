@@ -1,9 +1,12 @@
+import { formOptions } from "@tanstack/react-form";
 import { Shield, ShieldAlert, ShieldOff } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { Button } from "@/client/components/ui/button";
 import { Label } from "@/client/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/client/components/ui/radio-group";
 import { SafeSearch } from "@/server/domain/value-objects";
+import { useSetupTypedFormContext } from "./setup-form";
 
 export const stepSafeSearchSchema = z.object({
 	safeSearch: z.enum([SafeSearch.OFF, SafeSearch.MODERATE, SafeSearch.STRICT]),
@@ -11,40 +14,45 @@ export const stepSafeSearchSchema = z.object({
 
 export type SafeSearchFormValues = z.infer<typeof stepSafeSearchSchema>;
 
+export const safeSearchFormOpts = formOptions({
+	defaultValues: {
+		safeSearch: SafeSearch.MODERATE as SafeSearchFormValues["safeSearch"],
+	},
+	validators: {
+		onChange: stepSafeSearchSchema,
+	},
+});
+
 export interface SafeSearchStepProps {
-	// biome-ignore lint/suspicious/noExplicitAny: FormApi type is complex
-	form: any;
 	onSubmit: () => void;
 	onBack?: () => void;
 }
 
-const safeSearchOptions = [
-	{
-		value: SafeSearch.OFF,
-		label: "Désactivé",
-		description: "Aucun filtrage - tous les résultats sont affichés",
-		icon: ShieldOff,
-	},
-	{
-		value: SafeSearch.MODERATE,
-		label: "Modéré",
-		description: "Filtre le contenu explicite le plus sensible",
-		icon: Shield,
-	},
-	{
-		value: SafeSearch.STRICT,
-		label: "Strict",
-		description:
-			"Filtre tout le contenu explicite (recommandé pour les familles)",
-		icon: ShieldAlert,
-	},
-];
+export function SafeSearchStep({ onSubmit, onBack }: SafeSearchStepProps) {
+	const form = useSetupTypedFormContext(safeSearchFormOpts);
+	const { t } = useTranslation();
 
-export function SafeSearchStep({
-	form,
-	onSubmit,
-	onBack,
-}: SafeSearchStepProps) {
+	const safeSearchOptions = [
+		{
+			value: SafeSearch.OFF,
+			label: t("safeSearch.off"),
+			description: t("safeSearch.offDescription"),
+			icon: ShieldOff,
+		},
+		{
+			value: SafeSearch.MODERATE,
+			label: t("safeSearch.moderate"),
+			description: t("safeSearch.moderateDescription"),
+			icon: Shield,
+		},
+		{
+			value: SafeSearch.STRICT,
+			label: t("safeSearch.strict"),
+			description: t("safeSearch.strictDescription"),
+			icon: ShieldAlert,
+		},
+	];
+
 	return (
 		<form
 			onSubmit={(e) => {
@@ -55,8 +63,7 @@ export function SafeSearchStep({
 		>
 			<div className="space-y-4">
 				<form.Field name="safeSearch">
-					{/* biome-ignore lint/suspicious/noExplicitAny: FormApi type is complex */}
-					{(field: any) => (
+					{(field) => (
 						<RadioGroup
 							value={field.state.value}
 							onValueChange={(value) => field.handleChange(value as SafeSearch)}
@@ -100,11 +107,11 @@ export function SafeSearchStep({
 						onClick={onBack}
 						className="flex-1"
 					>
-						Retour
+						{t("common.back")}
 					</Button>
 				)}
 				<Button type="submit" className="flex-1">
-					Continuer
+					{t("setup.language.continue")}
 				</Button>
 			</div>
 		</form>

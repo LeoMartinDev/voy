@@ -1,7 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
-import { zodValidator } from "@tanstack/zod-adapter";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import {
+	defaultLanguageCode,
+	languageCodeTuple,
+	normalizeLanguageCode,
+} from "@/client/languages";
+import { getContainer } from "@/server/container";
+import { defaultUserSettings, SafeSearch } from "@/server/domain/value-objects";
 
 export const getSetupStatus = createServerFn({ method: "GET" }).handler(
 	async () => {
@@ -27,14 +33,63 @@ export const getSetupStatus = createServerFn({ method: "GET" }).handler(
 );
 
 const finalizeSetupSchema = z.object({
-	name: z.string().min(1, "Le nom est requis"),
-	email: z.email(),
+	name: z.string().min(1),
+	email: z.string().email(),
 	password: z.string().min(8),
-	safeSearch: z.string().optional(),
+	safeSearch: z
+		.enum([SafeSearch.OFF, SafeSearch.MODERATE, SafeSearch.STRICT])
+		.optional(),
+	language: z.enum(languageCodeTuple).optional(),
 });
 
+interface FinalizeSetupInput {
+	name?: unknown;
+	email?: unknown;
+	password?: unknown;
+	safeSearch?: unknown;
+	language?: unknown;
+}
+
+const normalizeFinalizeSetupInput = (data: unknown): FinalizeSetupInput => {
+	if (!data || typeof data !== "object") {
+		return {};
+	}
+
+	return data as FinalizeSetupInput;
+};
+
+const getSetupLocale = (input: FinalizeSetupInput) => {
+	const language =
+		typeof input.language === "string"
+			? normalizeLanguageCode(input.language)
+			: defaultLanguageCode;
+
+	return language === "fr" ? z.locales.fr() : z.locales.en();
+};
+
+const getCreatedUserId = (createdUser: unknown): string | null => {
+	if (!createdUser || typeof createdUser !== "object") {
+		return null;
+	}
+
+	const data = createdUser as {
+		user?: { id?: unknown };
+		id?: unknown;
+	};
+
+	if (typeof data.user?.id === "string" && data.user.id.length > 0) {
+		return data.user.id;
+	}
+
+	if (typeof data.id === "string" && data.id.length > 0) {
+		return data.id;
+	}
+
+	return null;
+};
+
 export const finalizeSetup = createServerFn({ method: "POST" })
-	.inputValidator(zodValidator(finalizeSetupSchema))
+	.inputValidator(normalizeFinalizeSetupInput)
 	.handler(async ({ data }) => {
 		const { db } = await import(
 			"@/server/infrastructure/persistence/drizzle/connection"
@@ -45,6 +100,14 @@ export const finalizeSetup = createServerFn({ method: "POST" })
 		const { auth } = await import("@/server/infrastructure/auth");
 
 		try {
+			const locale = getSetupLocale(data);
+			z.config(locale);
+
+			const validation = finalizeSetupSchema.safeParse(data);
+			if (!validation.success) {
+				throw validation.error;
+			}
+
 			const existingAdmin = await db
 				.select()
 				.from(user)
@@ -56,19 +119,45 @@ export const finalizeSetup = createServerFn({ method: "POST" })
 				throw new Error("Setup already completed");
 			}
 
-			await auth.api.createUser({
+			const createdUser = await auth.api.createUser({
 				body: {
-					name: data.name,
-					email: data.email,
-					password: data.password,
+					name: validation.data.name,
+					email: validation.data.email,
+					password: validation.data.password,
 					role: "admin",
+				},
+			});
+
+			let userId = getCreatedUserId(createdUser);
+			if (!userId) {
+				const createdAdmin = await db
+					.select({ id: user.id })
+					.from(user)
+					.where(eq(user.email, validation.data.email))
+					.limit(1);
+
+				userId = createdAdmin[0]?.id ?? null;
+			}
+
+			if (!userId) {
+				throw new Error("Unable to resolve created admin user ID");
+			}
+
+			const container = await getContainer();
+			await container.usecases.saveUserSettings({
+				userId,
+				settings: {
+					...defaultUserSettings,
+					safeSearch:
+						validation.data.safeSearch ?? defaultUserSettings.safeSearch,
+					language: validation.data.language ?? defaultLanguageCode,
 				},
 			});
 
 			await auth.api.signInEmail({
 				body: {
-					email: data.email,
-					password: data.password,
+					email: validation.data.email,
+					password: validation.data.password,
 				},
 			});
 		} catch (error) {

@@ -1,6 +1,7 @@
 import i18n from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { initReactI18next } from "react-i18next";
+import { defaultLanguageCode, supportedLanguageCodes } from "./languages";
 import { en } from "./locales/en";
 import { fr } from "./locales/fr";
 
@@ -12,9 +13,9 @@ i18n
 			en,
 			fr,
 		},
-		lng: typeof window === "undefined" ? "en" : undefined, // Force English on server
-		fallbackLng: "en",
-		supportedLngs: ["en", "fr"],
+		lng: typeof window === "undefined" ? defaultLanguageCode : undefined, // Force English on server
+		fallbackLng: defaultLanguageCode,
+		supportedLngs: supportedLanguageCodes,
 		load: "languageOnly",
 		interpolation: {
 			escapeValue: false, // react already safes from xss
