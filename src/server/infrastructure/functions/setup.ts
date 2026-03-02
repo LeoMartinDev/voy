@@ -6,8 +6,8 @@ import {
 	languageCodeTuple,
 	normalizeLanguageCode,
 } from "@/client/languages";
-import { defaultUserSettings, SafeSearch } from "@/server/domain/value-objects";
 import { getContainer } from "@/server/container";
+import { defaultUserSettings, SafeSearch } from "@/server/domain/value-objects";
 
 export const getSetupStatus = createServerFn({ method: "GET" }).handler(
 	async () => {
@@ -148,7 +148,8 @@ export const finalizeSetup = createServerFn({ method: "POST" })
 				userId,
 				settings: {
 					...defaultUserSettings,
-					safeSearch: validation.data.safeSearch ?? defaultUserSettings.safeSearch,
+					safeSearch:
+						validation.data.safeSearch ?? defaultUserSettings.safeSearch,
 					language: validation.data.language ?? defaultLanguageCode,
 				},
 			});

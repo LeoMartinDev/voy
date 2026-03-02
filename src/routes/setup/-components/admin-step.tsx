@@ -2,10 +2,10 @@ import { formOptions } from "@tanstack/react-form";
 import { useId } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
-import i18n from "@/client/i18n";
 import { Button } from "@/client/components/ui/button";
 import { Input } from "@/client/components/ui/input";
 import { Label } from "@/client/components/ui/label";
+import i18n from "@/client/i18n";
 import { useSetupTypedFormContext } from "./setup-form";
 
 export const adminSchema = z
