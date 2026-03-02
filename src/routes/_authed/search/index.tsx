@@ -27,13 +27,13 @@ import { ThemeToggle } from "@/client/components/theme-toggle";
 import { Button } from "@/client/components/ui/button";
 import { UserDropdown } from "@/client/components/user-dropdown";
 import { searchQueryOptions, useSearch } from "@/client/hooks/use-search";
-import { getPublicConfig } from "@/server/infrastructure/functions/instance-config";
 import {
 	SearchCategory,
 	type SearchCategory as SearchCategoryType,
 	TimeRange,
 	type TimeRange as TimeRangeType,
 } from "@/server/domain/value-objects";
+import { getPublicConfig } from "@/server/infrastructure/functions/instance-config";
 import { SearchLoading } from "./-components/results/search-loading";
 import { SearchResults } from "./-components/results/search-results";
 import { SearchFilters } from "./-components/search-filters";
