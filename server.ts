@@ -1,18 +1,23 @@
 import path from 'node:path'
+import {
+  createRequestContext,
+  withRequestIdHeader,
+} from './src/server/infrastructure/logging/request-context'
+import {
+  getServerLogger,
+  withLogContext,
+} from './src/server/infrastructure/logging/logger'
 
 const SERVER_PORT = Number(process.env.PORT ?? 3000)
-console.log(`[DEBUG] process.env.PORT = "${process.env.PORT}"`)
-console.log(`[DEBUG] Using port = ${SERVER_PORT}`)
 const CLIENT_DIRECTORY = './dist/client'
 const SERVER_ENTRY_POINT = './dist/server/server.js'
 
-const log = {
-  info: (message: string) => console.log(`[INFO] ${message}`),
-  success: (message: string) => console.log(`[SUCCESS] ${message}`),
-  warning: (message: string) => console.log(`[WARNING] ${message}`),
-  error: (message: string) => console.log(`[ERROR] ${message}`),
-  header: (message: string) => console.log(`\n${message}\n`),
-};
+const logger = withLogContext({
+  logger: getServerLogger(),
+  bindings: {
+    component: 'production-server',
+  },
+})
 
 const MAX_PRELOAD_BYTES = Number(process.env.ASSET_PRELOAD_MAX_SIZE ?? 5 * 1024 * 1024)
 
@@ -147,8 +152,21 @@ async function initializeStaticRoutes(clientDirectory: string): Promise<PreloadR
   const routes: Record<string, (req: Request) => Response | Promise<Response>> = {}
   const loaded: AssetMetadata[] = []
   const skipped: AssetMetadata[] = []
+  const staticAssetsLogger = withLogContext({
+    logger,
+    bindings: {
+      component: 'static-assets',
+    },
+  })
 
-  log.info(`Loading static assets from ${clientDirectory}...`)
+  staticAssetsLogger.info(
+    {
+      event: 'static_assets.preload.started',
+      clientDirectory,
+      maxPreloadBytes: MAX_PRELOAD_BYTES,
+    },
+    'Loading static assets',
+  )
 
   let totalPreloadedBytes = 0
 
@@ -200,27 +218,61 @@ async function initializeStaticRoutes(clientDirectory: string): Promise<PreloadR
         }
       } catch (error: unknown) {
         if (error instanceof Error && error.name !== 'EISDIR') {
-          log.error(`Failed to load ${filepath}: ${(error as Error).message}`)
+          staticAssetsLogger.error(
+            {
+              event: 'static_assets.preload.file_failed',
+              filepath,
+              err: error,
+            },
+            'Failed to preload static asset',
+          )
         }
       }
     }
 
-    console.log()
     if (loaded.length > 0) {
-      log.success(`Preloaded ${String(loaded.length)} files (${(totalPreloadedBytes / 1024 / 1024).toFixed(2)} MB) into memory`)
+      staticAssetsLogger.info(
+        {
+          event: 'static_assets.preload.completed',
+          loadedCount: loaded.length,
+          totalPreloadedBytes,
+          totalPreloadedMB: Number((totalPreloadedBytes / 1024 / 1024).toFixed(2)),
+        },
+        'Static assets preloaded in memory',
+      )
     }
     if (skipped.length > 0) {
-      log.info(`${String(skipped.length)} files will be served on-demand`)
+      staticAssetsLogger.info(
+        {
+          event: 'static_assets.preload.partial',
+          skippedCount: skipped.length,
+        },
+        'Some assets will be served on-demand',
+      )
     }
   } catch (error) {
-    log.error(`Failed to load static files from ${clientDirectory}: ${String(error)}`)
+    staticAssetsLogger.error(
+      {
+        event: 'static_assets.preload.failed',
+        clientDirectory,
+        err: error,
+      },
+      'Failed to initialize static routes',
+    )
   }
 
   return { routes, loaded, skipped }
 }
 
 async function initializeServer() {
-  log.header('Starting Production Server')
+  logger.info(
+    {
+      event: 'server.starting',
+      port: SERVER_PORT,
+      configuredPort: process.env.PORT ?? null,
+    },
+    'Starting production server',
+  )
 
   let handler: { fetch: (request: Request) => Response | Promise<Response> }
   try {
@@ -228,9 +280,20 @@ async function initializeServer() {
       default: { fetch: (request: Request) => Response | Promise<Response> }
     }
     handler = serverModule.default
-    log.success('TanStack Start application handler initialized')
+    logger.info(
+      {
+        event: 'server.handler.initialized',
+      },
+      'TanStack Start handler initialized',
+    )
   } catch (error) {
-    log.error(`Failed to load server handler: ${String(error)}`)
+    logger.error(
+      {
+        event: 'server.handler.initialization_failed',
+        err: error,
+      },
+      'Failed to load server handler',
+    )
     process.exit(1)
   }
 
@@ -240,25 +303,79 @@ async function initializeServer() {
     port: SERVER_PORT,
     routes: {
       ...routes,
-      '/*': (req: Request) => {
+      '/*': async (req: Request) => {
+        const startedAt = performance.now()
+        const requestContext = createRequestContext({
+          request: req,
+          logger,
+          operation: 'http.request',
+        })
+
         try {
-          return handler.fetch(req)
+          const response = await handler.fetch(req)
+          const durationMs = Math.round(performance.now() - startedAt)
+
+          requestContext.logger.info(
+            {
+              event: 'http.request.completed',
+              status: response.status,
+              durationMs,
+            },
+            'Request completed',
+          )
+
+          return withRequestIdHeader({
+            response,
+            requestId: requestContext.requestId,
+          })
         } catch (error) {
-          log.error(`Server handler error: ${String(error)}`)
-          return new Response('Internal Server Error', { status: 500 })
+          const durationMs = Math.round(performance.now() - startedAt)
+
+          requestContext.logger.error(
+            {
+              event: 'http.request.failed',
+              status: 500,
+              durationMs,
+              err: error,
+            },
+            'Unhandled request failure',
+          )
+
+          return withRequestIdHeader({
+            response: new Response('Internal Server Error', { status: 500 }),
+            requestId: requestContext.requestId,
+          })
         }
       },
     },
     error(error: Error) {
-      log.error(`Uncaught server error: ${error.message}`)
+      logger.error(
+        {
+          event: 'server.uncaught_error',
+          err: error,
+        },
+        'Uncaught server error',
+      )
       return new Response('Internal Server Error', { status: 500 })
     },
   })
 
-  log.success(`Server listening on http://localhost:${String(server.port)}`)
+  logger.info(
+    {
+      event: 'server.started',
+      port: server.port,
+    },
+    'Server listening',
+  )
 }
 
 initializeServer().catch((error: unknown) => {
-  log.error(`Failed to start server: ${String(error)}`)
+  logger.error(
+    {
+      event: 'server.start_failed',
+      err: error,
+    },
+    'Server failed to start',
+  )
   process.exit(1)
 })

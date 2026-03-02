@@ -4,11 +4,35 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { auth } from "@/server/infrastructure/auth";
 import { getSetupStatus } from "@/server/infrastructure/functions/setup";
+import {
+	getServerLogger,
+	withLogContext,
+} from "@/server/infrastructure/logging/logger";
+import { createRequestContext } from "@/server/infrastructure/logging/request-context";
+
+const logger = withLogContext({
+	logger: getServerLogger(),
+	bindings: {
+		component: "authed-route",
+	},
+});
 
 const getSessionFn = createServerFn({ method: "GET" }).handler(async () => {
+	const requestContext = createRequestContext({
+		request: getRequest(),
+		logger,
+		operation: "serverfn.session.get",
+	});
 	const session = await auth.api.getSession({
 		headers: getRequest().headers,
 	});
+	requestContext.logger.info(
+		{
+			event: "serverfn.session.get.completed",
+			authenticated: Boolean(session),
+		},
+		"Session lookup completed",
+	);
 	return session;
 });
 

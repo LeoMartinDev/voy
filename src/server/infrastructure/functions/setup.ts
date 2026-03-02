@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import {
@@ -8,9 +9,26 @@ import {
 } from "@/client/languages";
 import { getContainer } from "@/server/container";
 import { defaultUserSettings, SafeSearch } from "@/server/domain/value-objects";
+import {
+	getServerLogger,
+	withLogContext,
+} from "@/server/infrastructure/logging/logger";
+import { createRequestContext } from "@/server/infrastructure/logging/request-context";
+
+const logger = withLogContext({
+	logger: getServerLogger(),
+	bindings: {
+		component: "setup-server-fn",
+	},
+});
 
 export const getSetupStatus = createServerFn({ method: "GET" }).handler(
 	async () => {
+		const requestContext = createRequestContext({
+			request: getRequest(),
+			logger,
+			operation: "serverfn.setup.status",
+		});
 		const { db } = await import(
 			"@/server/infrastructure/persistence/drizzle/connection"
 		);
@@ -25,9 +43,21 @@ export const getSetupStatus = createServerFn({ method: "GET" }).handler(
 			.limit(1);
 
 		if (adminUser.length === 0) {
+			requestContext.logger.info(
+				{
+					event: "serverfn.setup.status.required",
+				},
+				"Setup is required",
+			);
 			return { setupRequired: true };
 		}
 
+		requestContext.logger.info(
+			{
+				event: "serverfn.setup.status.completed",
+			},
+			"Setup already completed",
+		);
 		return { setupRequired: false };
 	},
 );
@@ -91,6 +121,12 @@ const getCreatedUserId = (createdUser: unknown): string | null => {
 export const finalizeSetup = createServerFn({ method: "POST" })
 	.inputValidator(normalizeFinalizeSetupInput)
 	.handler(async ({ data }) => {
+		const startedAt = performance.now();
+		const requestContext = createRequestContext({
+			request: getRequest(),
+			logger,
+			operation: "serverfn.setup.finalize",
+		});
 		const { db } = await import(
 			"@/server/infrastructure/persistence/drizzle/connection"
 		);
@@ -115,7 +151,12 @@ export const finalizeSetup = createServerFn({ method: "POST" })
 				.limit(1);
 
 			if (existingAdmin.length > 0) {
-				console.warn("Setup already completed, blocking request");
+				requestContext.logger.warn(
+					{
+						event: "serverfn.setup.finalize.already_completed",
+					},
+					"Setup already completed, blocking request",
+				);
 				throw new Error("Setup already completed");
 			}
 
@@ -160,8 +201,23 @@ export const finalizeSetup = createServerFn({ method: "POST" })
 					password: validation.data.password,
 				},
 			});
+			requestContext.logger.info(
+				{
+					event: "serverfn.setup.finalize.completed",
+					userId,
+					durationMs: Math.round(performance.now() - startedAt),
+				},
+				"Setup finalized successfully",
+			);
 		} catch (error) {
-			console.error("Setup config error:", error);
+			requestContext.logger.error(
+				{
+					event: "serverfn.setup.finalize.failed",
+					durationMs: Math.round(performance.now() - startedAt),
+					err: error,
+				},
+				"Setup finalization failed",
+			);
 			throw error;
 		}
 	});

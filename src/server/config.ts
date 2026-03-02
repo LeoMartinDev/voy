@@ -1,5 +1,13 @@
 import { env } from "./env";
 
+const runtimeEnvironment =
+	process.env.BUN_ENV ?? process.env.NODE_ENV ?? "development";
+const isDevelopment = runtimeEnvironment !== "production";
+
+const redactPathsFromEnv = env.LOG_REDACT_PATHS?.split(",")
+	.map((value) => value.trim())
+	.filter(Boolean);
+
 export const config = {
 	searxng: {
 		url: env.SEARXNG_URL,
@@ -10,5 +18,12 @@ export const config = {
 	instance: {
 		name: env.INSTANCE_NAME ?? "Voy",
 		url: env.SITE_URL ?? "http://localhost:3000",
+	},
+	logging: {
+		level: env.LOG_LEVEL ?? (isDevelopment ? "debug" : "info"),
+		pretty: env.LOG_PRETTY ? env.LOG_PRETTY === "true" : isDevelopment,
+		redactPaths: redactPathsFromEnv ?? [],
+		environment: runtimeEnvironment,
+		serviceName: "voy",
 	},
 } as const;

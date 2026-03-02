@@ -63,6 +63,10 @@ import type {
 import { makeInMemoryCache } from "./infrastructure/cache/in-memory-cache";
 import { makeLruCache } from "./infrastructure/cache/lru-cache";
 import { makeSearXngSearchEngine } from "./infrastructure/http/searxng/search-engine";
+import {
+	getServerLogger,
+	withLogContext,
+} from "./infrastructure/logging/logger";
 import { db } from "./infrastructure/persistence/drizzle/connection";
 import { makeDrizzleApiKeyRepository } from "./infrastructure/persistence/repositories/drizzle-api-key-repository";
 import { makeDrizzleInstanceConfigRepository } from "./infrastructure/persistence/repositories/drizzle-instance-config-repository";
@@ -80,6 +84,7 @@ export interface Container {
 		instanceConfigCache: Cache<InstanceConfig>;
 		searchCache: Cache<SearchResult>;
 		suggestCache: Cache<SuggestResult>;
+		logger: ReturnType<typeof getServerLogger>;
 	};
 	services: {
 		userSettings: UserSettingsService;
@@ -104,7 +109,20 @@ let _container: Container | null = null;
 export async function getContainer(): Promise<Container> {
 	if (_container) return _container;
 
-	const searchEngine = makeSearXngSearchEngine();
+	const logger = withLogContext({
+		logger: getServerLogger(),
+		bindings: {
+			component: "container",
+		},
+	});
+	const searchEngine = makeSearXngSearchEngine({
+		logger: withLogContext({
+			logger,
+			bindings: {
+				component: "searxng",
+			},
+		}),
+	});
 	const userRepository = makeDrizzleUserRepository({ db });
 	const userSettingsRepository = makeDrizzleUserSettingsRepository({ db });
 	const instanceConfigRepository = makeDrizzleInstanceConfigRepository({ db });
@@ -161,6 +179,7 @@ export async function getContainer(): Promise<Container> {
 			instanceConfigCache,
 			searchCache,
 			suggestCache,
+			logger,
 		},
 		services: {
 			userSettings: userSettingsService,

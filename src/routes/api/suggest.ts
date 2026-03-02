@@ -1,5 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getContainer } from "@/server/container";
+import {
+	getServerLogger,
+	withLogContext,
+} from "@/server/infrastructure/logging/logger";
+import {
+	createRequestContext,
+	withRequestIdHeader,
+} from "@/server/infrastructure/logging/request-context";
 
 const SUGGEST_HEADERS = {
 	"Content-Type": "application/x-suggestions+json",
@@ -15,6 +23,13 @@ const CORS_HEADERS = {
 	"Access-Control-Allow-Headers": "*",
 	"Access-Control-Max-Age": "600",
 } as const;
+
+const logger = withLogContext({
+	logger: getServerLogger(),
+	bindings: {
+		component: "api-suggest-route",
+	},
+});
 
 export const Route = createFileRoute("/api/suggest")({
 	server: {
@@ -32,15 +47,25 @@ export const Route = createFileRoute("/api/suggest")({
 				});
 			},
 			GET: async ({ request }) => {
+				const startedAt = performance.now();
+				const requestContext = createRequestContext({
+					request,
+					logger,
+					operation: "api.suggest",
+				});
 				const url = new URL(request.url);
 				const query = url.searchParams.get("q") ?? "";
 				const limitParam = url.searchParams.get("limit") ?? "6";
 				const limit = Number.parseInt(limitParam, 10) || 6;
 
 				if (!query) {
-					return new Response(JSON.stringify(["", [], [], []]), {
+					const response = new Response(JSON.stringify(["", [], [], []]), {
 						status: 200,
 						headers: SUGGEST_HEADERS,
+					});
+					return withRequestIdHeader({
+						response,
+						requestId: requestContext.requestId,
 					});
 				}
 
@@ -52,16 +77,41 @@ export const Route = createFileRoute("/api/suggest")({
 					});
 
 					const openSearchResponse = [query, suggestions, [], []];
+					requestContext.logger.info(
+						{
+							event: "api.suggest.completed",
+							status: 200,
+							suggestionsCount: suggestions.length,
+							durationMs: Math.round(performance.now() - startedAt),
+						},
+						"Suggest API request completed",
+					);
 
-					return new Response(JSON.stringify(openSearchResponse), {
+					const response = new Response(JSON.stringify(openSearchResponse), {
 						status: 200,
 						headers: SUGGEST_HEADERS,
 					});
+					return withRequestIdHeader({
+						response,
+						requestId: requestContext.requestId,
+					});
 				} catch (error) {
-					console.error("SearXNG suggest error", error);
-					return new Response(JSON.stringify([query, [], [], []]), {
+					requestContext.logger.error(
+						{
+							event: "api.suggest.failed",
+							status: 200,
+							durationMs: Math.round(performance.now() - startedAt),
+							err: error,
+						},
+						"Suggest API fallback to empty response",
+					);
+					const response = new Response(JSON.stringify([query, [], [], []]), {
 						status: 200,
 						headers: SUGGEST_HEADERS,
+					});
+					return withRequestIdHeader({
+						response,
+						requestId: requestContext.requestId,
 					});
 				}
 			},

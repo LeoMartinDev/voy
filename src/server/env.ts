@@ -6,6 +6,11 @@ const envSchema = z.object({
 	BETTER_AUTH_SECRET: z.string(),
 	SITE_URL: z.url(),
 	INSTANCE_NAME: z.string().min(3).optional(),
+	LOG_LEVEL: z
+		.enum(["trace", "debug", "info", "warn", "error", "fatal", "silent"])
+		.optional(),
+	LOG_PRETTY: z.enum(["true", "false"]).optional(),
+	LOG_REDACT_PATHS: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

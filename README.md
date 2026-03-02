@@ -197,6 +197,16 @@ through configuring safe search and creating your admin account.
 | `INSTANCE_NAME`      | No       | `Voy`    | Display name shown in the UI   |
 | `DATABASE_URL`       | No       | `dev.db` | SQLite database file path      |
 | `PORT`               | No       | `3000`   | HTTP server port               |
+| `LOG_LEVEL`          | No       | `info`   | Server log verbosity           |
+| `LOG_PRETTY`         | No       | `false`  | Pretty logs for local debugging |
+| `LOG_REDACT_PATHS`   | No       | —        | Comma-separated redact paths override |
+
+### Logging
+
+- The server emits structured JSON logs suitable for container logging backends.
+- Each request is correlated with `x-request-id` and the header is returned in responses.
+- Sensitive fields are redacted by default (auth headers, cookies, tokens, passwords, API keys).
+- Recommended production settings: `LOG_LEVEL=info`, `LOG_PRETTY=false`.
 
 ## API
 

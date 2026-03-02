@@ -6,6 +6,14 @@ import {
 	SearchCategory,
 	TimeRange,
 } from "@/server/domain/value-objects/search.vo";
+import {
+	getServerLogger,
+	withLogContext,
+} from "@/server/infrastructure/logging/logger";
+import {
+	createRequestContext,
+	withRequestIdHeader,
+} from "@/server/infrastructure/logging/request-context";
 
 const SEARCH_HEADERS = {
 	"Content-Type": "application/json",
@@ -23,6 +31,13 @@ const searchSchema = z.object({
 	safeSearch: z.enum(SafeSearch).optional(),
 });
 
+const logger = withLogContext({
+	logger: getServerLogger(),
+	bindings: {
+		component: "api-search-route",
+	},
+});
+
 export const Route = createFileRoute("/api/search")({
 	server: {
 		handlers: {
@@ -33,13 +48,19 @@ export const Route = createFileRoute("/api/search")({
 				});
 			},
 			GET: async ({ request }) => {
+				const startedAt = performance.now();
+				const requestContext = createRequestContext({
+					request,
+					logger,
+					operation: "api.search",
+				});
 				const url = new URL(request.url);
 				const entries = Object.fromEntries(url.searchParams.entries());
 
 				const validation = searchSchema.safeParse(entries);
 
 				if (!validation.success) {
-					return new Response(
+					const response = new Response(
 						JSON.stringify({
 							error: "Validation error",
 							details: validation.error.flatten().fieldErrors,
@@ -49,6 +70,18 @@ export const Route = createFileRoute("/api/search")({
 							headers: SEARCH_HEADERS,
 						},
 					);
+					requestContext.logger.warn(
+						{
+							event: "api.search.validation_failed",
+							status: 400,
+							durationMs: Math.round(performance.now() - startedAt),
+						},
+						"Search API validation failed",
+					);
+					return withRequestIdHeader({
+						response,
+						requestId: requestContext.requestId,
+					});
 				}
 
 				const {
@@ -64,9 +97,24 @@ export const Route = createFileRoute("/api/search")({
 				const apiKey = await container.usecases.validateApiKey({ key: token });
 
 				if (!apiKey) {
-					return new Response(JSON.stringify({ error: "Invalid API key" }), {
-						status: 401,
-						headers: SEARCH_HEADERS,
+					const response = new Response(
+						JSON.stringify({ error: "Invalid API key" }),
+						{
+							status: 401,
+							headers: SEARCH_HEADERS,
+						},
+					);
+					requestContext.logger.warn(
+						{
+							event: "api.search.invalid_api_key",
+							status: 401,
+							durationMs: Math.round(performance.now() - startedAt),
+						},
+						"Search API rejected invalid key",
+					);
+					return withRequestIdHeader({
+						response,
+						requestId: requestContext.requestId,
 					});
 				}
 
@@ -79,19 +127,46 @@ export const Route = createFileRoute("/api/search")({
 						safeSearch,
 					});
 
-					return new Response(JSON.stringify(result), {
+					requestContext.logger.info(
+						{
+							event: "api.search.completed",
+							userId: apiKey.userId,
+							status: 200,
+							resultCount: result.count,
+							durationMs: Math.round(performance.now() - startedAt),
+						},
+						"Search API request completed",
+					);
+					const response = new Response(JSON.stringify(result), {
 						status: 200,
 						headers: SEARCH_HEADERS,
 					});
+					return withRequestIdHeader({
+						response,
+						requestId: requestContext.requestId,
+					});
 				} catch (error) {
-					console.error("Search API error", error);
-					return new Response(
+					requestContext.logger.error(
+						{
+							event: "api.search.failed",
+							userId: apiKey.userId,
+							status: 500,
+							durationMs: Math.round(performance.now() - startedAt),
+							err: error,
+						},
+						"Search API request failed",
+					);
+					const response = new Response(
 						JSON.stringify({ error: "Internal Server Error" }),
 						{
 							status: 500,
 							headers: SEARCH_HEADERS,
 						},
 					);
+					return withRequestIdHeader({
+						response,
+						requestId: requestContext.requestId,
+					});
 				}
 			},
 		},

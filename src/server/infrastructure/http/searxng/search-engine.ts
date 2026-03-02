@@ -13,6 +13,11 @@ import {
 	SearchCategory,
 	TimeRange,
 } from "@/server/domain/value-objects";
+import type { AppLogger } from "@/server/infrastructure/logging/logger";
+import {
+	getServerLogger,
+	withLogContext,
+} from "@/server/infrastructure/logging/logger";
 import { extractFileExtension } from "@/server/infrastructure/utils/file-extension";
 
 const resolveImageUrl = (
@@ -98,9 +103,21 @@ const toSearXngSafeSearchParam = (
 	return map[safeSearch];
 };
 
-export const makeSearXngSearchEngine = (): SearchEngine => {
+export const makeSearXngSearchEngine = ({
+	logger,
+}: {
+	logger: AppLogger;
+}): SearchEngine => {
+	const searxngLogger = withLogContext({
+		logger,
+		bindings: {
+			component: "searxng-adapter",
+		},
+	});
+
 	return {
 		search: async ({ query, category, safeSearch, timeRange }) => {
+			const startedAt = performance.now();
 			const params = new URLSearchParams({
 				q: query,
 				format: "json",
@@ -121,14 +138,20 @@ export const makeSearXngSearchEngine = (): SearchEngine => {
 				params.set("safesearch", safesearchParam);
 			}
 
+			const endpoint = "/search";
 			const response = await fetch(
-				`${config.searxng.url}/search?${params.toString()}`,
+				`${config.searxng.url}${endpoint}?${params.toString()}`,
 			);
 			if (!response.ok) {
-				console.error(
-					"SearXNG search error",
-					response.status,
-					response.statusText,
+				searxngLogger.error(
+					{
+						event: "searxng.search.failed",
+						endpoint,
+						status: response.status,
+						statusText: response.statusText,
+						durationMs: Math.round(performance.now() - startedAt),
+					},
+					"SearXNG search request failed",
 				);
 				throw new Error(`SearXNG error: ${response.statusText}`);
 			}
@@ -178,10 +201,22 @@ export const makeSearXngSearchEngine = (): SearchEngine => {
 				count: searXngResponse.results.length,
 			};
 
+			searxngLogger.info(
+				{
+					event: "searxng.search.completed",
+					endpoint,
+					status: response.status,
+					resultCount: result.count,
+					durationMs: Math.round(performance.now() - startedAt),
+				},
+				"SearXNG search request completed",
+			);
+
 			return result;
 		},
 
 		suggest: async ({ query, limit = 6 }): Promise<SuggestResult> => {
+			const startedAt = performance.now();
 			try {
 				const params = new URLSearchParams({
 					q: query,
@@ -189,15 +224,21 @@ export const makeSearXngSearchEngine = (): SearchEngine => {
 					limit: limit.toString(),
 				});
 
+				const endpoint = "/autocompleter";
 				const response = await fetch(
-					`${config.searxng.url}/autocompleter?${params.toString()}`,
+					`${config.searxng.url}${endpoint}?${params.toString()}`,
 				);
 
 				if (!response.ok) {
-					console.error(
-						"SearXNG suggest error",
-						response.status,
-						response.statusText,
+					searxngLogger.warn(
+						{
+							event: "searxng.suggest.failed",
+							endpoint,
+							status: response.status,
+							statusText: response.statusText,
+							durationMs: Math.round(performance.now() - startedAt),
+						},
+						"SearXNG suggest request failed",
 					);
 					return { suggestions: [] };
 				}
@@ -206,17 +247,42 @@ export const makeSearXngSearchEngine = (): SearchEngine => {
 				const parsed = SearXNGSuggestionsSchema.safeParse(data);
 
 				if (!parsed.success) {
-					console.error("SearXNG suggest parse error", parsed.error);
+					searxngLogger.warn(
+						{
+							event: "searxng.suggest.parse_failed",
+							endpoint,
+							durationMs: Math.round(performance.now() - startedAt),
+							errorName: parsed.error.name,
+						},
+						"SearXNG suggest response parsing failed",
+					);
 					return { suggestions: [] };
 				}
 
 				const suggestions = parsed.data[1]?.slice(0, limit) ?? [];
+				searxngLogger.info(
+					{
+						event: "searxng.suggest.completed",
+						endpoint,
+						status: response.status,
+						suggestionsCount: suggestions.length,
+						durationMs: Math.round(performance.now() - startedAt),
+					},
+					"SearXNG suggest request completed",
+				);
 
 				return {
 					suggestions,
 				};
 			} catch (error) {
-				console.error("SearXNG suggest error", error);
+				searxngLogger.error(
+					{
+						event: "searxng.suggest.exception",
+						durationMs: Math.round(performance.now() - startedAt),
+						err: error,
+					},
+					"SearXNG suggest request errored",
+				);
 				return { suggestions: [] };
 			}
 		},
@@ -224,9 +290,22 @@ export const makeSearXngSearchEngine = (): SearchEngine => {
 };
 
 if (import.meta.main) {
-	const engine = makeSearXngSearchEngine();
+	const engine = makeSearXngSearchEngine({
+		logger: withLogContext({
+			logger: getServerLogger(),
+			bindings: {
+				component: "searxng-cli",
+			},
+		}),
+	});
 
 	const results = await engine.suggest({ query: "What is the capi" });
 
-	console.log(results);
+	getServerLogger().info(
+		{
+			event: "searxng.cli.result",
+			suggestionsCount: results.suggestions.length,
+		},
+		"SearXNG CLI suggest finished",
+	);
 }
