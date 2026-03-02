@@ -19,7 +19,7 @@ export const sessionQueryOptions = queryOptions({
 });
 
 export const Route = createFileRoute("/_authed")({
-	loader: async ({ context: { queryClient }, location }) => {
+	beforeLoad: async ({ context: { queryClient }, location }) => {
 		const { setupRequired } = await getSetupStatus();
 
 		if (setupRequired) {

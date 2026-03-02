@@ -27,6 +27,7 @@ import { ThemeToggle } from "@/client/components/theme-toggle";
 import { Button } from "@/client/components/ui/button";
 import { UserDropdown } from "@/client/components/user-dropdown";
 import { searchQueryOptions, useSearch } from "@/client/hooks/use-search";
+import { getPublicConfig } from "@/server/infrastructure/functions/instance-config";
 import {
 	SearchCategory,
 	type SearchCategory as SearchCategoryType,
@@ -61,23 +62,33 @@ export const Route = createFileRoute("/_authed/search/")({
 			throw redirect({ to: "/" });
 		}
 	},
-	loader: ({ context, deps: { q, category, timeRange } }) => {
-		if (!q) return;
+	loader: async ({ context, deps: { q, category, timeRange } }) => {
+		const { instanceName } = await getPublicConfig();
+
+		if (!q) return { instanceName };
+		const session = context.queryClient.getQueryData(["session"]);
+		if (!session) return { instanceName };
+
 		// Normalize category to match component behavior and avoid double-fetch
 		// Component defaults undefined category to SearchCategory.WEB
-		void context.queryClient.ensureQueryData(
-			searchQueryOptions({
-				query: q,
-				category: category ?? SearchCategory.WEB,
-				timeRange,
-			}),
-		);
+		void context.queryClient
+			.ensureQueryData(
+				searchQueryOptions({
+					query: q,
+					category: category ?? SearchCategory.WEB,
+					timeRange,
+				}),
+			)
+			.catch((error) => {
+				console.error("Search prefetch failed:", error);
+			});
+		return { instanceName };
 	},
-	head: () => {
+	head: ({ loaderData }) => {
 		return {
 			meta: [
 				{
-					title: "Search - Voy",
+					title: `Search - ${loaderData?.instanceName ?? "Voy"}`,
 				},
 			],
 		};
