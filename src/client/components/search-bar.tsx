@@ -226,11 +226,11 @@ export function SearchBar({
 								flex items-center justify-center rounded-full
 								text-muted-foreground/40 transition-all duration-200
 								hover:bg-muted hover:text-foreground
-								${isCompact ? "h-7 w-7" : "h-8 w-8"}
+								${isCompact ? "h-8 w-8 md:h-7 md:w-7" : "h-10 w-10 md:h-8 md:w-8"}
 							`}
 							aria-label="Clear search"
 						>
-							<X className="h-3.5 w-3.5" />
+							<X className="h-4 w-4 md:h-3.5 md:w-3.5" />
 						</button>
 					</div>
 
@@ -245,12 +245,12 @@ export function SearchBar({
 							transition-all duration-300
 							disabled:opacity-30 disabled:cursor-not-allowed
 							enabled:hover:bg-primary/10 enabled:hover:text-primary enabled:active:scale-95
-							${isCompact ? "h-7 w-8" : "h-9 w-10"}
+							${isCompact ? "h-8 w-9 md:h-7 md:w-8" : "h-10 w-11 md:h-9 md:w-10"}
 						`}
 						aria-label="Submit search"
 					>
 						<ArrowRight
-							className={`transition-transform duration-300 ${query.trim() ? "group-hover/search:translate-x-0.5" : ""} ${isCompact ? "h-4 w-4" : "h-5 w-5"}`}
+							className={`transition-transform duration-300 ${query.trim() ? "group-hover/search:translate-x-0.5" : ""} ${isCompact ? "h-5 w-5 md:h-4 md:w-4" : "h-6 w-6 md:h-5 md:w-5"}`}
 						/>
 					</button>
 				</div>

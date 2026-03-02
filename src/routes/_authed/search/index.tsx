@@ -249,8 +249,10 @@ function SearchPage() {
 							<SearchBar variant="compact" initialQuery={query} />
 						</div>
 
-						<div className="hidden items-center gap-3 md:flex ml-auto">
-							<ThemeToggle />
+						<div className="flex items-center gap-2 md:gap-3 ml-auto shrink-0">
+							<div className="hidden md:block">
+								<ThemeToggle />
+							</div>
 							<UserDropdown />
 						</div>
 					</div>
