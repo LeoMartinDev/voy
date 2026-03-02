@@ -11,6 +11,7 @@ export const en = {
 			saveChanges: "Save changes",
 			savedSuccess: "Settings saved successfully",
 			savedError: "Failed to save settings",
+			genericError: "Something went wrong",
 		},
 		search: {
 			placeholder: "What are you looking for?",
@@ -112,6 +113,37 @@ export const en = {
 		languages: {
 			en: "English",
 			fr: "Français",
+		},
+		setup: {
+			title: "Initial Configuration",
+			steps: {
+				language: "Language",
+				languageDescription: "Choose your preferred language",
+				safeSearch: "Content Filtering",
+				safeSearchDescription: "Configure content filtering",
+				admin: "Admin Account",
+				adminDescription: "Create your administrator account",
+			},
+			language: {
+				title: "Language",
+				description: "Please select your preferred language for the interface.",
+				continue: "Continue",
+			},
+			admin: {
+				name: "Name",
+				email: "Email",
+				password: "Password",
+				confirmPassword: "Confirm Password",
+				createAccount: "Create Account",
+				nameRequired: "Name is required",
+				emailInvalid: "Invalid email",
+				passwordMinLength: "Password must be at least 8 characters",
+				passwordsDoNotMatch: "Passwords do not match",
+			},
+			safeSearch: {
+				title: "Safe Search",
+				description: "Select the level of content filtering you prefer.",
+			},
 		},
 	},
 };

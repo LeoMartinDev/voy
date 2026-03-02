@@ -1,28 +1,52 @@
+import { formOptions } from "@tanstack/react-form";
 import { useId } from "react";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { Button } from "@/client/components/ui/button";
 import { Input } from "@/client/components/ui/input";
 import { Label } from "@/client/components/ui/label";
+import { useSetupTypedFormContext } from "./setup-form";
 
+export const createStep2Schema = (t: (key: string) => string) =>
+	z
+		.object({
+			name: z.string().min(1, t("setup.admin.nameRequired")),
+			email: z.string().email(t("setup.admin.emailInvalid")),
+			password: z.string().min(8, t("setup.admin.passwordMinLength")),
+			confirmPassword: z.string(),
+		})
+		.refine((data) => data.password === data.confirmPassword, {
+			message: t("setup.admin.passwordsDoNotMatch"),
+			path: ["confirmPassword"],
+		});
+
+// Fallback schema for types or initial render
 export const step2Schema = z
 	.object({
-		name: z.string().min(1, "Le nom est requis"),
-		email: z.email("Email invalide"),
-		password: z
-			.string()
-			.min(8, "Le mot de passe doit contenir au moins 8 caractères"),
+		name: z.string().min(1),
+		email: z.string().email(),
+		password: z.string().min(8),
 		confirmPassword: z.string(),
 	})
 	.refine((data) => data.password === data.confirmPassword, {
-		message: "Les mots de passe ne correspondent pas",
 		path: ["confirmPassword"],
 	});
 
 export type AdminFormValues = z.infer<typeof step2Schema>;
 
+export const adminFormOpts = formOptions({
+	defaultValues: {
+		name: "",
+		email: "",
+		password: "",
+		confirmPassword: "",
+	},
+	validators: {
+		onChange: step2Schema,
+	},
+});
+
 export interface AdminStepProps {
-	// biome-ignore lint/suspicious/noExplicitAny: FormApi type is complex
-	form: any;
 	onBack: () => void;
 	onSubmit?: () => void;
 	isPending: boolean;
@@ -30,12 +54,13 @@ export interface AdminStepProps {
 }
 
 export function AdminStep({
-	form,
 	onBack,
 	onSubmit,
 	isPending,
 	hasAttemptedSubmit,
 }: AdminStepProps) {
+	const form = useSetupTypedFormContext(adminFormOpts);
+	const { t } = useTranslation();
 	const nameId = useId();
 	const emailId = useId();
 	const passwordId = useId();
@@ -46,15 +71,13 @@ export function AdminStep({
 			onSubmit={(e) => {
 				e.preventDefault();
 				onSubmit?.();
-				form.handleSubmit();
 			}}
 			className="space-y-4"
 		>
 			<div className="space-y-2">
-				<Label htmlFor={nameId}>Votre nom</Label>
+				<Label htmlFor={nameId}>{t("setup.admin.name")}</Label>
 				<form.Field name="name">
-					{/* biome-ignore lint/suspicious/noExplicitAny: FormApi type is complex */}
-					{(field: any) => (
+					{(field) => (
 						<>
 							<Input
 								id={nameId}
@@ -75,10 +98,9 @@ export function AdminStep({
 			</div>
 
 			<div className="space-y-2">
-				<Label htmlFor={emailId}>Email</Label>
+				<Label htmlFor={emailId}>{t("setup.admin.email")}</Label>
 				<form.Field name="email">
-					{/* biome-ignore lint/suspicious/noExplicitAny: FormApi type is complex */}
-					{(field: any) => (
+					{(field) => (
 						<>
 							<Input
 								id={emailId}
@@ -99,10 +121,9 @@ export function AdminStep({
 			</div>
 
 			<div className="space-y-2">
-				<Label htmlFor={passwordId}>Mot de passe</Label>
+				<Label htmlFor={passwordId}>{t("setup.admin.password")}</Label>
 				<form.Field name="password">
-					{/* biome-ignore lint/suspicious/noExplicitAny: FormApi type is complex */}
-					{(field: any) => (
+					{(field) => (
 						<>
 							<Input
 								id={passwordId}
@@ -123,10 +144,11 @@ export function AdminStep({
 			</div>
 
 			<div className="space-y-2">
-				<Label htmlFor={confirmPasswordId}>Confirmer le mot de passe</Label>
+				<Label htmlFor={confirmPasswordId}>
+					{t("setup.admin.confirmPassword")}
+				</Label>
 				<form.Field name="confirmPassword">
-					{/* biome-ignore lint/suspicious/noExplicitAny: FormApi type is complex */}
-					{(field: any) => (
+					{(field) => (
 						<>
 							<Input
 								id={confirmPasswordId}
@@ -153,10 +175,10 @@ export function AdminStep({
 					onClick={onBack}
 					disabled={isPending}
 				>
-					Retour
+					{t("common.back")}
 				</Button>
 				<Button type="submit" className="flex-1" disabled={isPending}>
-					{isPending ? "Configuration..." : "Finaliser"}
+					{isPending ? t("common.saving") : t("setup.admin.createAccount")}
 				</Button>
 			</div>
 		</form>

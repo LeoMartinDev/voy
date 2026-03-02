@@ -1,4 +1,3 @@
-import type { ServeOptions, Server } from 'bun'
 import path from 'node:path'
 
 const SERVER_PORT = Number(process.env.PORT ?? 3000)
@@ -254,7 +253,7 @@ async function initializeServer() {
       log.error(`Uncaught server error: ${error.message}`)
       return new Response('Internal Server Error', { status: 500 })
     },
-  } as unknown as ServeOptions) as Server
+  })
 
   log.success(`Server listening on http://localhost:${String(server.port)}`)
 }

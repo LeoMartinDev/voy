@@ -1,10 +1,10 @@
 import { defineStepper } from "@stepperize/react";
-import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Check } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/client/utils";
 import { SafeSearch } from "@/server/domain/value-objects";
 import {
@@ -13,21 +13,30 @@ import {
 } from "@/server/infrastructure/functions/setup";
 import {
 	AdminStep,
+	adminFormOpts,
+	createStep2Schema,
+	LanguageStep,
+	languageFormOpts,
 	SafeSearchStep,
-	step2Schema,
-	stepSafeSearchSchema,
+	safeSearchFormOpts,
 } from "./setup/-components";
+import { useSetupForm } from "./setup/-components/setup-form";
 
 const { useStepper } = defineStepper(
 	{
+		id: "language",
+		title: "setup.steps.language",
+		description: "setup.steps.languageDescription",
+	},
+	{
 		id: "safe-search",
-		title: "Filtrage",
-		description: "Configurez le filtrage de contenu",
+		title: "setup.steps.safeSearch",
+		description: "setup.steps.safeSearchDescription",
 	},
 	{
 		id: "admin",
-		title: "Compte Admin",
-		description: "Créez votre compte administrateur",
+		title: "setup.steps.admin",
+		description: "setup.steps.adminDescription",
 	},
 );
 
@@ -48,11 +57,17 @@ export const Route = createFileRoute("/setup")({
 });
 
 function SetupPage() {
+	const { t, i18n } = useTranslation();
 	const navigate = useNavigate();
 	const stepper = useStepper();
 	const [error, setError] = useState<string | null>(null);
 	const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 	const [mounted, setMounted] = useState(false);
+	const normalizedLanguage = (
+		i18n.resolvedLanguage ||
+		i18n.language ||
+		"en"
+	).split("-")[0] as "en" | "fr";
 
 	useEffect(() => {
 		setMounted(true);
@@ -71,32 +86,36 @@ function SetupPage() {
 		},
 		onError: (error) => {
 			setError(
-				error instanceof Error ? error.message : "Une erreur est survenue",
+				error instanceof Error ? error.message : t("common.genericError"),
 			);
 		},
 	});
 
-	const safeSearchForm = useForm({
+	const languageForm = useSetupForm({
+		...languageFormOpts,
 		defaultValues: {
-			safeSearch: SafeSearch.MODERATE as SafeSearch,
-		},
-		validators: {
-			onChange: stepSafeSearchSchema,
+			...languageFormOpts.defaultValues,
+			language: normalizedLanguage,
 		},
 		onSubmit: async () => {
 			stepper.navigation.next();
 		},
 	});
 
-	const adminForm = useForm({
-		defaultValues: {
-			name: "",
-			email: "",
-			password: "",
-			confirmPassword: "",
+	const safeSearchForm = useSetupForm({
+		...safeSearchFormOpts,
+		onSubmit: async () => {
+			stepper.navigation.next();
 		},
+	});
+
+	const adminSchema = useMemo(() => createStep2Schema(t), [t]);
+
+	const adminForm = useSetupForm({
+		...adminFormOpts,
 		validators: {
-			onChange: step2Schema,
+			...adminFormOpts.validators,
+			onChange: adminSchema,
 		},
 		onSubmit: async ({ value }) => {
 			const rawSafeSearch = safeSearchForm.state.values.safeSearch;
@@ -127,7 +146,7 @@ function SetupPage() {
 					<div className="w-full max-w-md space-y-8">
 						<div className="text-center space-y-2">
 							<h1 className="text-2xl font-semibold tracking-tight">
-								Configuration initiale
+								{t("setup.title")}
 							</h1>
 						</div>
 
@@ -178,7 +197,7 @@ function SetupPage() {
 															: "text-muted-foreground",
 													)}
 												>
-													{step.title}
+													{t(step.title)}
 												</span>
 											</div>
 
@@ -199,32 +218,47 @@ function SetupPage() {
 
 							<div className="pt-8 text-center">
 								<p className="text-sm text-muted-foreground">
-									{mounted
-										? stepper.state.current.data.title
-										: stepper.state.all[0].title}
+									{t(
+										mounted
+											? stepper.state.current.data.title
+											: stepper.state.all[0].title,
+									)}
 									:{" "}
-									{mounted
-										? stepper.state.current.data.description
-										: stepper.state.all[0].description}
+									{t(
+										mounted
+											? stepper.state.current.data.description
+											: stepper.state.all[0].description,
+									)}
 								</p>
 							</div>
 						</div>
 
 						{stepper.flow.switch({
+							language: () => (
+								<languageForm.AppForm>
+									<LanguageStep onSubmit={() => languageForm.handleSubmit()} />
+								</languageForm.AppForm>
+							),
 							"safe-search": () => (
-								<SafeSearchStep
-									form={safeSearchForm}
-									onSubmit={() => safeSearchForm.handleSubmit()}
-								/>
+								<safeSearchForm.AppForm>
+									<SafeSearchStep
+										onSubmit={() => safeSearchForm.handleSubmit()}
+										onBack={() => stepper.navigation.prev()}
+									/>
+								</safeSearchForm.AppForm>
 							),
 							admin: () => (
-								<AdminStep
-									form={adminForm}
-									hasAttemptedSubmit={hasAttemptedSubmit}
-									isPending={setupMutation.isPending}
-									onBack={() => stepper.navigation.prev()}
-									onSubmit={() => setHasAttemptedSubmit(true)}
-								/>
+								<adminForm.AppForm>
+									<AdminStep
+										hasAttemptedSubmit={hasAttemptedSubmit}
+										isPending={setupMutation.isPending}
+										onBack={() => stepper.navigation.prev()}
+										onSubmit={() => {
+											setHasAttemptedSubmit(true);
+											adminForm.handleSubmit();
+										}}
+									/>
+								</adminForm.AppForm>
 							),
 						})}
 					</div>
