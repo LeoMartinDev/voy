@@ -1,32 +1,29 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { authClient } from "@/server/infrastructure/auth/client";
-import { getUserSettings } from "@/server/infrastructure/functions/user-settings";
+import { userSettingsQueryOptions } from "@/server/infrastructure/functions/user-settings";
 
 export function LanguageSync() {
 	const { i18n } = useTranslation();
 	const synced = useRef(false);
 	const { data: session, isPending } = authClient.useSession();
+	const { data: userSettings } = useQuery({
+		...userSettingsQueryOptions,
+		enabled: !isPending && Boolean(session),
+	});
 
 	useEffect(() => {
-		if (synced.current || isPending || !session) return;
+		if (synced.current || isPending || !session || !userSettings) return;
 
-		const syncLanguage = async () => {
-			try {
-				const settings = await getUserSettings();
-				if (settings.language && settings.language !== i18n.language) {
-					i18n.changeLanguage(settings.language);
-				}
-			} catch (e) {
-				console.error("Failed to sync language", e);
-			} finally {
-				synced.current = true;
-			}
-		};
-		syncLanguage();
-	}, [i18n, session, isPending]);
+		if (userSettings.language && userSettings.language !== i18n.language) {
+			i18n.changeLanguage(userSettings.language);
+		}
+
+		synced.current = true;
+	}, [i18n, session, isPending, userSettings]);
 
 	return null;
 }

@@ -1,9 +1,10 @@
 "use client";
 
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as React from "react";
 import {
-	getUserSettings,
 	saveUserSettings,
+	userSettingsQueryOptions,
 } from "@/server/infrastructure/functions/user-settings";
 
 type Theme = "light" | "dark" | "system";
@@ -48,6 +49,9 @@ export function ThemeProvider({
 	);
 
 	const [hasSyncedFromDb, setHasSyncedFromDb] = React.useState(false);
+	const queryClient = useQueryClient();
+	const { data: userSettingsFromDb, isFetched: hasFetchedUserSettings } =
+		useQuery(userSettingsQueryOptions);
 
 	React.useEffect(() => {
 		const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -74,41 +78,44 @@ export function ThemeProvider({
 
 	React.useEffect(() => {
 		if (hasSyncedFromDb) return;
+		if (!hasFetchedUserSettings) return;
 
-		let mounted = true;
+		if (userSettingsFromDb?.theme && userSettingsFromDb.theme !== theme) {
+			setThemeState(userSettingsFromDb.theme);
+		}
 
-		const syncThemeFromDb = async () => {
-			try {
-				const settings = await getUserSettings();
-				if (mounted && settings.theme && settings.theme !== theme) {
-					setThemeState(settings.theme);
-				}
-			} catch {
-			} finally {
-				if (mounted) {
-					setHasSyncedFromDb(true);
-				}
-			}
-		};
+		setHasSyncedFromDb(true);
+	}, [
+		hasFetchedUserSettings,
+		hasSyncedFromDb,
+		theme,
+		userSettingsFromDb?.theme,
+	]);
 
-		syncThemeFromDb();
+	const setTheme = React.useCallback(
+		(newTheme: Theme) => {
+			setThemeState(newTheme);
 
-		return () => {
-			mounted = false;
-		};
-	}, [theme, hasSyncedFromDb]);
-
-	const setTheme = React.useCallback((newTheme: Theme) => {
-		setThemeState(newTheme);
-
-		getUserSettings()
-			.then((currentSettings) => {
-				return saveUserSettings({
-					data: { ...currentSettings, theme: newTheme },
-				});
-			})
-			.catch(() => {});
-	}, []);
+			queryClient
+				.ensureQueryData(userSettingsQueryOptions)
+				.then((currentSettings) => {
+					return saveUserSettings({
+						data: { ...currentSettings, theme: newTheme },
+					});
+				})
+				.then(() => {
+					queryClient.setQueryData(
+						userSettingsQueryOptions.queryKey,
+						(previous) => {
+							if (!previous) return previous;
+							return { ...previous, theme: newTheme };
+						},
+					);
+				})
+				.catch(() => {});
+		},
+		[queryClient],
+	);
 
 	return (
 		<ThemeContext.Provider value={{ theme, resolvedTheme, setTheme }}>

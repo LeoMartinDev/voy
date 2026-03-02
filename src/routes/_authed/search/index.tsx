@@ -14,10 +14,9 @@ import {
 	Component,
 	type ReactNode,
 	Suspense,
-	startTransition,
 	useEffect,
 	useId,
-	useOptimistic,
+	useState,
 } from "react";
 import z from "zod";
 
@@ -175,6 +174,8 @@ function SearchPage() {
 	const { instanceName } = rootRoute.useLoaderData();
 	const searchResultsId = useId();
 	const navigate = useNavigate();
+	const [pendingCategory, setPendingCategory] =
+		useState<SearchCategoryType | null>(null);
 
 	useEffect(() => {
 		if (query) {
@@ -188,34 +189,34 @@ function SearchPage() {
 	}, [query, instanceName]);
 
 	const urlCategory = category ?? SearchCategory.WEB;
-	const [optimisticCategory, setOptimisticCategory] =
-		useOptimistic(urlCategory);
+	const activeCategory = pendingCategory ?? urlCategory;
+	const resultsCategory = urlCategory;
 
-	const activeCategory = optimisticCategory;
+	useEffect(() => {
+		setPendingCategory((current) => {
+			if (current === urlCategory) return null;
+			return current;
+		});
+	}, [urlCategory]);
 
 	const handleCategoryChange = (
 		newCategory: (typeof SearchCategory)[keyof typeof SearchCategory],
 	) => {
-		startTransition(() => {
-			setOptimisticCategory(newCategory);
-			navigate({
-				to: "/search",
-				search: (prev) => ({ ...prev, category: newCategory }),
-			});
+		if (newCategory === activeCategory) return;
+		setPendingCategory(newCategory);
+		navigate({
+			to: "/search",
+			search: (prev) => ({ ...prev, category: newCategory }),
 		});
 	};
 
-	const [optimisticTimeRange, setOptimisticTimeRange] =
-		useOptimistic(timeRange);
-	const activeTimeRange = optimisticTimeRange;
+	const activeTimeRange = timeRange;
 
 	const handleTimeRangeChange = (newTimeRange: TimeRangeType | undefined) => {
-		startTransition(() => {
-			setOptimisticTimeRange(newTimeRange);
-			navigate({
-				to: "/search",
-				search: (prev) => ({ ...prev, timeRange: newTimeRange }),
-			});
+		if (newTimeRange === activeTimeRange) return;
+		navigate({
+			to: "/search",
+			search: (prev) => ({ ...prev, timeRange: newTimeRange }),
 		});
 	};
 
@@ -282,9 +283,9 @@ function SearchPage() {
 							}
 						>
 							<SearchResultsList
-								key={`${query}-${activeCategory}-${activeTimeRange ?? "all"}`}
+								key={`${query}-${resultsCategory}-${activeTimeRange ?? "all"}`}
 								query={query}
-								category={activeCategory}
+								category={resultsCategory}
 								timeRange={activeTimeRange}
 							/>
 						</Suspense>
