@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { languageCodeTuple } from "@/client/languages";
 import { SafeSearch } from "./search.vo";
 
 export const instanceConfigSchema = z.object({});
@@ -13,7 +14,7 @@ export const userSettingsSchema = z.object({
 		.default(SafeSearch.OFF),
 	openInNewTab: z.boolean().default(true),
 	theme: z.enum(["light", "dark", "system"]).default("system"),
-	language: z.enum(["en", "fr"]).default("en"),
+	language: z.enum(languageCodeTuple).default("en"),
 });
 
 export type UserSettings = z.infer<typeof userSettingsSchema>;

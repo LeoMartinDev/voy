@@ -11,6 +11,7 @@ export const fr = {
 			saveChanges: "Enregistrer les modifications",
 			savedSuccess: "Paramètres enregistrés avec succès",
 			savedError: "Échec de l'enregistrement des paramètres",
+			genericError: "Une erreur est survenue",
 		},
 		search: {
 			placeholder: "Que recherchez-vous ?",
@@ -113,6 +114,46 @@ export const fr = {
 		languages: {
 			en: "English",
 			fr: "Français",
+		},
+		setup: {
+			title: "Configuration initiale",
+			steps: {
+				language: "Langue",
+				languageDescription: "Choisissez votre langue préférée",
+				safeSearch: "Filtrage",
+				safeSearchDescription: "Configurez le filtrage de contenu",
+				admin: "Compte Admin",
+				adminDescription: "Créez votre compte administrateur",
+			},
+			language: {
+				title: "Langue",
+				description:
+					"Veuillez sélectionner votre langue préférée pour l'interface.",
+				continue: "Continuer",
+			},
+			admin: {
+				name: "Nom",
+				email: "Email",
+				password: "Mot de passe",
+				confirmPassword: "Confirmer le mot de passe",
+				createAccount: "Créer le compte",
+				nameRequired: "Le nom est requis",
+				emailInvalid: "Email invalide",
+				passwordMinLength:
+					"Le mot de passe doit contenir au moins 8 caractères",
+				passwordsDoNotMatch: "Les mots de passe ne correspondent pas",
+			},
+			safeSearch: {
+				title: "Safe Search",
+				description:
+					"Sélectionnez le niveau de filtrage de contenu que vous préférez.",
+			},
+		},
+		validation: {
+			required: "Ce champ est requis",
+			invalidEmail: "Email invalide",
+			minLength: "Doit contenir au moins {{count}} caractères",
+			invalid: "Valeur invalide",
 		},
 	},
 };

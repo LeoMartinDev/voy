@@ -12,6 +12,7 @@ import { getPublicConfig } from "@/server/infrastructure/functions/instance-conf
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
 import "@/client/i18n";
+import "@/client/zod";
 import { useTranslation } from "react-i18next";
 import { LanguageSync } from "@/client/components/language-sync";
 
