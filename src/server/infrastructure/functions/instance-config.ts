@@ -1,9 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
-import { getContainer } from "@/server/container";
 import type { InstanceConfig } from "@/server/domain/value-objects";
 import { instanceConfigSchema } from "@/server/domain/value-objects";
-import { auth } from "@/server/infrastructure/auth";
 import {
 	getServerLogger,
 	withLogContext,
@@ -20,28 +18,6 @@ const logger = withLogContext({
 	},
 });
 
-export type PublicConfig = {
-	instanceName: string;
-};
-
-export const getPublicConfig = createServerFn({ method: "GET" }).handler(
-	async (): Promise<PublicConfig> => {
-		const requestContext = createRequestContext({
-			request: getRequest(),
-			logger,
-			operation: "serverfn.instance_config.public",
-		});
-		const { config } = await import("@/server/config");
-		requestContext.logger.info(
-			{
-				event: "serverfn.instance_config.public.completed",
-			},
-			"Fetched public instance configuration",
-		);
-		return { instanceName: config.instance.name };
-	},
-);
-
 export const getInstanceConfig = createServerFn({ method: "GET" }).handler(
 	async (): Promise<InstanceConfig> => {
 		const requestContext = createRequestContext({
@@ -49,6 +25,7 @@ export const getInstanceConfig = createServerFn({ method: "GET" }).handler(
 			logger,
 			operation: "serverfn.instance_config.get",
 		});
+		const { getContainer } = await import("@/server/container");
 		const container = await getContainer();
 		const instanceConfig = await container.usecases.getInstanceConfig();
 		requestContext.logger.info(
@@ -66,6 +43,10 @@ export const saveInstanceConfig = createServerFn({ method: "POST" })
 		(data: unknown) => instanceConfigSchema.parse(data) as InstanceConfig,
 	)
 	.handler(async ({ data }) => {
+		const [{ auth }, { getContainer }] = await Promise.all([
+			import("@/server/infrastructure/auth"),
+			import("@/server/container"),
+		]);
 		const requestContext = createRequestContext({
 			request: getRequest(),
 			logger,

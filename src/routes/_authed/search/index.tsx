@@ -32,7 +32,7 @@ import {
 	TimeRange,
 	type TimeRange as TimeRangeType,
 } from "@/server/domain/value-objects";
-import { getPublicConfig } from "@/server/infrastructure/functions/instance-config";
+import { getPublicConfig } from "@/server/infrastructure/functions/public-config";
 import { SearchLoading } from "./-components/results/search-loading";
 import { SearchResults } from "./-components/results/search-results";
 import { SearchFilters } from "./-components/search-filters";

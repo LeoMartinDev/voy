@@ -25,5 +25,3 @@ export const auth = betterAuth({
 		}),
 	],
 });
-
-export { authClient } from "./client";

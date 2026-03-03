@@ -8,7 +8,7 @@ import {
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { ThemeProvider } from "@/client/components/theme-provider";
 import { Toaster } from "@/client/components/ui/sonner";
-import { getPublicConfig } from "@/server/infrastructure/functions/instance-config";
+import { getPublicConfig } from "@/server/infrastructure/functions/public-config";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
 import "@/client/i18n";

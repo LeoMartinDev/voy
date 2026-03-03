@@ -5,7 +5,7 @@ const runtimeEnvironment =
 
 const isProduction = runtimeEnvironment === "production";
 
-const logLevel: ClientLogLevel = isProduction ? "warn" : "debug";
+const logLevel: ClientLogLevel = isProduction ? "info" : "debug";
 
 export const clientConfig = {
 	runtimeEnvironment,
