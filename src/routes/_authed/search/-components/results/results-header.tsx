@@ -1,5 +1,3 @@
-"use client";
-
 import { Zap } from "lucide-react";
 
 interface ResultsHeaderProps {

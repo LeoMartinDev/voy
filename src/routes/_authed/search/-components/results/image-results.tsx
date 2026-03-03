@@ -1,5 +1,3 @@
-"use client";
-
 import { ExternalLink, ImageIcon, Maximize2 } from "lucide-react";
 import { useState } from "react";
 import { useLinkTarget } from "@/client/hooks/use-link-target";

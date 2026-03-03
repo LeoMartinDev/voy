@@ -1,5 +1,3 @@
-"use client";
-
 import { useRouter } from "@tanstack/react-router";
 import { ArrowRight, Search, X } from "lucide-react";
 import type React from "react";

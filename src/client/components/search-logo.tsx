@@ -1,5 +1,3 @@
-"use client";
-
 import { getRouteApi } from "@tanstack/react-router";
 
 const rootRoute = getRouteApi("__root__");

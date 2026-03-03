@@ -1,5 +1,3 @@
-"use client";
-
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import type {
 	SearchCategory as SearchCategoryType,
