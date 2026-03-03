@@ -2,10 +2,10 @@ import i18n from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { initReactI18next } from "react-i18next";
 import { clientConfig } from "./config";
-import { makeClientLogger } from "./logging/client-logger";
 import { defaultLanguageCode, supportedLanguageCodes } from "./languages";
 import { en } from "./locales/en";
 import { fr } from "./locales/fr";
+import { makeClientLogger } from "./logging/client-logger";
 
 const logger = makeClientLogger({
 	scope: "i18n",
@@ -28,7 +28,11 @@ const i18nLoggerPlugin = {
 	},
 } as const;
 
-i18n.use(i18nLoggerPlugin).use(LanguageDetector).use(initReactI18next).init({
+i18n
+	.use(i18nLoggerPlugin)
+	.use(LanguageDetector)
+	.use(initReactI18next)
+	.init({
 		resources: {
 			en,
 			fr,

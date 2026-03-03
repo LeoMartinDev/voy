@@ -21,7 +21,8 @@ const getCanLogForLevel = ({
 }: {
 	currentLevel: ClientLogLevel;
 	targetLevel: Exclude<ClientLogLevel, "silent">;
-}): boolean => LOG_LEVEL_PRIORITY[targetLevel] >= LOG_LEVEL_PRIORITY[currentLevel];
+}): boolean =>
+	LOG_LEVEL_PRIORITY[targetLevel] >= LOG_LEVEL_PRIORITY[currentLevel];
 
 const withScopePrefix = ({
 	scope,
