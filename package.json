@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "bun --bun run server.ts",
+    "start": "bun --bun run .output/server/index.mjs",
     "dev": "bun --bun vite dev --host 0.0.0.0",
     "build": "bun --bun vite build",
     "preview": "bun --bun vite preview",
@@ -78,6 +78,7 @@
     "dotenv": "^16.0.0",
     "husky": "^9.1.7",
     "jsdom": "^27.0.0",
+    "nitro": "npm:nitro-nightly@latest",
     "tsx": "^4.0.0",
     "typescript": "^5.7.2",
     "vite": "^7.1.7",

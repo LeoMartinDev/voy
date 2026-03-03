@@ -34,10 +34,9 @@ RUN addgroup --system --gid 1001 nodejs && \
   chown -R nodejs:nodejs /data && \
   apk add --no-cache su-exec
 
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/.output ./.output
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/server.ts ./server.ts
 COPY --from=builder /app/src/server/infrastructure/persistence/drizzle/migrations ./src/server/infrastructure/persistence/drizzle/migrations
 COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
@@ -54,4 +53,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://0.0.0.0:$PORT/api/health || exit 1
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["bun", "run", "server.ts"]
+CMD ["bun", "start"]
