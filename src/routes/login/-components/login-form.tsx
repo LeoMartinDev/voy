@@ -1,6 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { Loader2 } from "lucide-react";
 import { useId, useState } from "react";
 import { z } from "zod";
 import { Button } from "@/client/components/ui/button";
@@ -22,6 +23,7 @@ const loginSchema = z.object({
 
 interface LoginFormProps extends React.ComponentProps<"form"> {
 	redirectTo?: string;
+	oidc?: { displayName: string } | null;
 }
 
 function getLoginRedirectHref({ redirectTo }: { redirectTo?: string }): string {
@@ -36,11 +38,17 @@ function getLoginRedirectHref({ redirectTo }: { redirectTo?: string }): string {
 	return redirectTo;
 }
 
-export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
+export function LoginForm({
+	className,
+	redirectTo,
+	oidc,
+	...props
+}: LoginFormProps) {
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
 	const [error, setError] = useState<string | null>(null);
 	const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
+	const [isSsoLoading, setIsSsoLoading] = useState(false);
 	const emailId = useId();
 	const passwordId = useId();
 
@@ -151,6 +159,34 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
 						)}
 					</form.Subscribe>
 				</Field>
+
+				{oidc && (
+					<>
+						<div className="relative flex items-center">
+							<div className="flex-1 border-t" />
+							<span className="text-muted-foreground px-3 text-xs">or</span>
+							<div className="flex-1 border-t" />
+						</div>
+						<Button
+							type="button"
+							variant="outline"
+							disabled={isSsoLoading}
+							onClick={async () => {
+								setIsSsoLoading(true);
+								await authClient.signIn.oauth2({
+									providerId: "oidc",
+									callbackURL: getLoginRedirectHref({ redirectTo }),
+								});
+								setIsSsoLoading(false);
+							}}
+						>
+							{isSsoLoading ? (
+								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+							) : null}
+							Sign in with {oidc.displayName}
+						</Button>
+					</>
+				)}
 			</FieldGroup>
 		</form>
 	);

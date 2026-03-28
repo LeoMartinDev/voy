@@ -72,15 +72,13 @@ export function UserDropdown() {
 					</div>
 				</DropdownMenuLabel>
 				<DropdownMenuSeparator />
-				{user.role === "admin" && (
-					<DropdownMenuItem
-						onClick={() => navigate({ to: "/settings" })}
-						className="cursor-pointer"
-					>
-						<Settings className="mr-2 h-4 w-4" />
-						<span>Settings</span>
-					</DropdownMenuItem>
-				)}
+				<DropdownMenuItem
+					onClick={() => navigate({ to: "/settings" })}
+					className="cursor-pointer"
+				>
+					<Settings className="mr-2 h-4 w-4" />
+					<span>Settings</span>
+				</DropdownMenuItem>
 				<DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
 					<LogOut className="mr-2 h-4 w-4" />
 					<span>Disconnect</span>
