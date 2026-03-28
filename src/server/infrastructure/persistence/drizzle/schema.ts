@@ -60,6 +60,11 @@ export const account = sqliteTable("account", {
 	refreshToken: text("refreshToken"),
 	idToken: text("idToken"),
 	expiresAt: integer("expiresAt", { mode: "timestamp" }),
+	accessTokenExpiresAt: integer("accessTokenExpiresAt", { mode: "timestamp" }),
+	refreshTokenExpiresAt: integer("refreshTokenExpiresAt", {
+		mode: "timestamp",
+	}),
+	scope: text("scope"),
 	password: text("password"),
 	createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
 	updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),

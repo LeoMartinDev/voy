@@ -11,6 +11,12 @@ const envSchema = z.object({
 		.optional(),
 	LOG_PRETTY: z.enum(["true", "false"]).optional(),
 	LOG_REDACT_PATHS: z.string().optional(),
+	OIDC_CLIENT_ID: z.string().optional(),
+	OIDC_CLIENT_SECRET: z.string().optional(),
+	OIDC_ISSUER_URL: z.url().optional(),
+	OIDC_DISPLAY_NAME: z.string().optional(),
+	OIDC_ADMIN_CLAIM: z.string().optional(),
+	OIDC_ADMIN_VALUE: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
