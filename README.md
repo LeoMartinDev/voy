@@ -18,7 +18,7 @@ your own server — no tracking, no data sent to third parties.
 - **Web, Image & File search** — switch between result categories with tab-based
   filters
 - **Autocomplete** — real-time search suggestions as you type
-- **Authentication** — email/password login with admin and user roles
+- **Authentication** — email/password login with admin and user roles, optional SSO via any OIDC provider
 - **Per-user settings** — theme (light/dark/system), safe search level, link
   behavior, AI toggle
 - **OpenSearch support** — add Voy as a search provider in your browser
@@ -200,10 +200,48 @@ through configuring safe search and creating your admin account.
 | `LOG_LEVEL`          | No       | `info`   | Server log verbosity           |
 | `LOG_PRETTY`         | No       | `false`  | Pretty logs for local debugging |
 | `LOG_REDACT_PATHS`   | No       | —        | Comma-separated redact paths override |
+| `OIDC_ISSUER_URL`    | No       | —        | Issuer URL of your OIDC provider      |
+| `OIDC_CLIENT_ID`     | No       | —        | OAuth2 client ID                      |
+| `OIDC_CLIENT_SECRET` | No       | —        | OAuth2 client secret                  |
+| `OIDC_DISPLAY_NAME`  | No       | `SSO`    | Label on the login button             |
+| `OIDC_ADMIN_CLAIM`   | No       | —        | Profile claim used to grant admin role (e.g. `groups`) |
+| `OIDC_ADMIN_VALUE`   | No       | —        | Value within that claim that maps to admin (e.g. `voy-admins`) |
 
-### Logging
+### SSO / OIDC
 
-- The server emits structured JSON logs suitable for container logging backends.
+Voy supports single sign-on via any OIDC-compliant provider (Keycloak, Authentik, Okta, Auth0, etc.). When configured, a "Sign in with SSO" button appears on the login page alongside the existing email/password form.
+
+**1. Register a client with your provider**
+
+Set the redirect/callback URL to:
+
+```
+{SITE_URL}/api/auth/oauth2/callback/oidc
+```
+
+**2. Add the environment variables**
+
+```env
+OIDC_ISSUER_URL=https://sso.example.com/realms/myrealm
+OIDC_CLIENT_ID=voy
+OIDC_CLIENT_SECRET=your-client-secret
+OIDC_DISPLAY_NAME=SSO   # optional, defaults to "SSO"
+```
+
+**3. Admin role mapping (optional)**
+
+To automatically grant the admin role based on group membership from the IdP, set both:
+
+```env
+OIDC_ADMIN_CLAIM=groups        # the claim name in the OIDC profile
+OIDC_ADMIN_VALUE=voy-admins    # the value that indicates admin
+```
+
+The claim is re-evaluated on every login — removing a user from the group in the IdP will downgrade their role on their next sign-in. Common claim names are `groups` (Keycloak, Authentik) and `roles` (some Okta/Auth0 setups). Your provider may require requesting an additional scope to include group claims in the token.
+
+If `OIDC_ADMIN_CLAIM` / `OIDC_ADMIN_VALUE` are not set, SSO users are assigned the default `user` role. Admin access can still be granted manually via the admin panel.
+
+### Logging- The server emits structured JSON logs suitable for container logging backends.
 - Each request is correlated with `x-request-id` and the header is returned in responses.
 - Sensitive fields are redacted by default (auth headers, cookies, tokens, passwords, API keys).
 - Recommended production settings: `LOG_LEVEL=info`, `LOG_PRETTY=false`.
