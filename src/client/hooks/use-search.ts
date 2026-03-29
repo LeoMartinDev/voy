@@ -1,4 +1,7 @@
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import {
+	infiniteQueryOptions,
+	useSuspenseInfiniteQuery,
+} from "@tanstack/react-query";
 import type {
 	SearchCategory as SearchCategoryType,
 	TimeRange as TimeRangeType,
@@ -9,18 +12,16 @@ interface UseSearchOptions {
 	query: string | undefined;
 	category?: SearchCategoryType;
 	timeRange?: TimeRangeType;
-	staleTime?: number;
 }
 
-export const searchQueryOptions = ({
+export const infiniteSearchQueryOptions = ({
 	query,
 	category,
 	timeRange,
-	staleTime = Infinity,
 }: UseSearchOptions) =>
-	queryOptions({
+	infiniteQueryOptions({
 		queryKey: ["search", query, category, timeRange],
-		queryFn: async () => {
+		queryFn: async ({ pageParam }) => {
 			if (!query) throw new Error("Query is required");
 
 			const result = await searchFn({
@@ -28,6 +29,7 @@ export const searchQueryOptions = ({
 					query,
 					category,
 					timeRange,
+					page: pageParam,
 				},
 			});
 
@@ -37,13 +39,18 @@ export const searchQueryOptions = ({
 
 			return result.data;
 		},
-		staleTime,
+		initialPageParam: 1,
+		getNextPageParam: (lastPage, allPages) => {
+			if (lastPage.results.length === 0) return undefined;
+			return allPages.length + 1;
+		},
+		staleTime: Infinity,
 		gcTime: Infinity,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,
 		refetchOnMount: false,
 	});
 
-export function useSearch(options: UseSearchOptions) {
-	return useSuspenseQuery(searchQueryOptions(options));
+export function useInfiniteSearch(options: UseSearchOptions) {
+	return useSuspenseInfiniteQuery(infiniteSearchQueryOptions(options));
 }

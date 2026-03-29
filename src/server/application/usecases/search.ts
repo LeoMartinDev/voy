@@ -11,7 +11,14 @@ export const makeSearchUsecase =
 		searchEngine: SearchEngine;
 		cache: Cache<SearchResult>;
 	}): SearchUsecase =>
-	async ({ query, category, timeRange, locale, safeSearch }: SearchInput) => {
+	async ({
+		query,
+		category,
+		timeRange,
+		locale,
+		safeSearch,
+		page,
+	}: SearchInput) => {
 		const startTime = performance.now();
 
 		const cacheKey = JSON.stringify({
@@ -20,6 +27,7 @@ export const makeSearchUsecase =
 			timeRange,
 			locale,
 			safeSearch,
+			page,
 		});
 
 		const cached = await cache.get(cacheKey);
@@ -38,6 +46,7 @@ export const makeSearchUsecase =
 			timeRange,
 			locale,
 			safeSearch,
+			page,
 		});
 
 		const searchResult = {
