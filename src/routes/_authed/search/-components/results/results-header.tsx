@@ -5,7 +5,7 @@ interface ResultsHeaderProps {
 	query: string;
 	duration?: number;
 	cached?: boolean;
-	type?: "result" | "image" | "file";
+	type?: "result" | "image" | "file" | "video";
 }
 
 export function ResultsHeader({
@@ -16,7 +16,13 @@ export function ResultsHeader({
 	type = "result",
 }: ResultsHeaderProps) {
 	const typeLabel =
-		type === "image" ? "image" : type === "file" ? "file" : "result";
+		type === "image"
+			? "image"
+			: type === "file"
+				? "file"
+				: type === "video"
+					? "video"
+					: "result";
 	const pluralLabel = count !== 1 ? `${typeLabel}s` : typeLabel;
 
 	const formatDuration = (ms: number): string => {

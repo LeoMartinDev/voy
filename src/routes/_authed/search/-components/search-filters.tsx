@@ -4,6 +4,7 @@ import {
 	FileIcon,
 	Globe,
 	ImageIcon,
+	Video,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/client/components/ui/button";
@@ -26,6 +27,7 @@ const FILTERS: {
 }[] = [
 	{ id: SearchCategory.WEB, icon: Globe },
 	{ id: SearchCategory.IMAGES, icon: ImageIcon },
+	{ id: SearchCategory.VIDEOS, icon: Video },
 	{ id: SearchCategory.FILES, icon: FileIcon },
 ];
 

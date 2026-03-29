@@ -3,10 +3,12 @@ import type { SearchResult } from "@/server/domain/value-objects";
 import {
 	isFileResult,
 	isImageResult,
+	isVideoResult,
 	isWebResult,
 } from "@/server/domain/value-objects";
 import { FileResults } from "./file-results";
 import { ImageResults } from "./image-results";
+import { VideoResults } from "./video-results";
 import { WebResults } from "./web-results";
 
 interface SearchResultsProps {
@@ -97,6 +99,17 @@ export function SearchResults({ query, results }: SearchResultsProps) {
 			<FileResults
 				query={query}
 				results={results.results.filter(isFileResult)}
+				duration={results.duration}
+				cached={results.cached}
+			/>
+		);
+	}
+
+	if (isVideoResult(firstResult)) {
+		return (
+			<VideoResults
+				query={query}
+				results={results.results.filter(isVideoResult)}
 				duration={results.duration}
 				cached={results.cached}
 			/>
