@@ -1,5 +1,5 @@
-import { ExternalLink, Play, Video } from "lucide-react";
-import { useState } from "react";
+import { ExternalLink, Play, Video, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useLinkTarget } from "@/client/hooks/use-link-target";
 import type { VideoResultEntry } from "@/server/domain/value-objects";
 import { ResultsHeader } from "./results-header";
@@ -14,10 +14,18 @@ interface VideoResultsProps {
 interface VideoCardProps {
 	result: VideoResultEntry;
 	linkTargetProps: { target?: "_blank"; rel?: string };
+	isActive: boolean;
+	onPlay: () => void;
+	onClose: () => void;
 }
 
-function VideoCard({ result, linkTargetProps }: VideoCardProps) {
-	const [embedActive, setEmbedActive] = useState(false);
+function VideoCard({
+	result,
+	linkTargetProps,
+	isActive,
+	onPlay,
+	onClose,
+}: VideoCardProps) {
 	const [thumbnailError, setThumbnailError] = useState(false);
 
 	const hostname = (() => {
@@ -36,9 +44,9 @@ function VideoCard({ result, linkTargetProps }: VideoCardProps) {
 			}).format(result.publishedDate)
 		: null;
 
-	if (embedActive && result.iframeSrc) {
+	if (isActive && result.iframeSrc) {
 		return (
-			<div className="flex flex-col gap-2">
+			<div className="flex flex-col gap-3 animate-in fade-in zoom-in-95 duration-200">
 				<div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black ring-1 ring-border/30">
 					<iframe
 						src={result.iframeSrc}
@@ -47,6 +55,14 @@ function VideoCard({ result, linkTargetProps }: VideoCardProps) {
 						allowFullScreen
 						className="h-full w-full"
 					/>
+					<button
+						type="button"
+						onClick={onClose}
+						aria-label="Close video"
+						className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 ring-1 ring-white/20 backdrop-blur-sm transition-all duration-200 hover:bg-black/80 hover:scale-105"
+					>
+						<X className="h-4 w-4 text-white" />
+					</button>
 				</div>
 				<div className="px-1">
 					<a
@@ -56,9 +72,11 @@ function VideoCard({ result, linkTargetProps }: VideoCardProps) {
 					>
 						{result.title}
 					</a>
-					{hostname && (
-						<p className="mt-0.5 text-xs text-muted-foreground">{hostname}</p>
-					)}
+					<div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
+						{hostname && <span>{hostname}</span>}
+						{hostname && formattedDate && <span>·</span>}
+						{formattedDate && <span>{formattedDate}</span>}
+					</div>
 				</div>
 			</div>
 		);
@@ -69,7 +87,7 @@ function VideoCard({ result, linkTargetProps }: VideoCardProps) {
 			<button
 				type="button"
 				className="group relative aspect-video w-full overflow-hidden rounded-2xl bg-muted/30 ring-1 ring-border/30 transition-all duration-300 hover:shadow-xl hover:shadow-foreground/10"
-				onClick={() => result.iframeSrc && setEmbedActive(true)}
+				onClick={() => result.iframeSrc && onPlay()}
 				aria-label={`Play ${result.title}`}
 			>
 				{result.thumbnail && !thumbnailError ? (
@@ -146,7 +164,7 @@ export function VideoResultsSkeleton() {
 				<div className="h-4 w-32 rounded-lg bg-muted animate-pulse" />
 				<div className="h-4 w-20 rounded-lg bg-muted animate-pulse [animation-delay:100ms]" />
 			</div>
-			<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+			<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
 				{SKELETON_IDS.map((id, i) => (
 					<div key={id} className="flex flex-col gap-2">
 						<div
@@ -179,6 +197,16 @@ export function VideoResults({
 	cached,
 }: VideoResultsProps) {
 	const linkTargetProps = useLinkTarget();
+	const [activeIndex, setActiveIndex] = useState<number | null>(null);
+	const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+	useEffect(() => {
+		if (activeIndex === null) return;
+		const el = cardRefs.current[activeIndex];
+		if (el) {
+			el.scrollIntoView({ behavior: "smooth", block: "center" });
+		}
+	}, [activeIndex]);
 
 	if (results.length === 0) {
 		return (
@@ -207,13 +235,23 @@ export function VideoResults({
 					type="video"
 				/>
 			</div>
-			<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+			<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
 				{results.map((result, i) => (
-					<VideoCard
+					<div
 						key={`${i}-${result.url}`}
-						result={result}
-						linkTargetProps={linkTargetProps}
-					/>
+						ref={(el) => {
+							cardRefs.current[i] = el;
+						}}
+						className={`transition-all duration-200${activeIndex === i ? " col-span-full" : ""}`}
+					>
+						<VideoCard
+							result={result}
+							linkTargetProps={linkTargetProps}
+							isActive={activeIndex === i}
+							onPlay={() => setActiveIndex(i)}
+							onClose={() => setActiveIndex(null)}
+						/>
+					</div>
 				))}
 			</div>
 		</section>
