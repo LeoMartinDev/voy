@@ -20,12 +20,16 @@ import {
 } from "react";
 import z from "zod";
 
+import { InfiniteScrollSentinel } from "@/client/components/infinite-scroll-sentinel";
 import { SearchBar } from "@/client/components/search-bar";
 import { SearchLogo } from "@/client/components/search-logo";
 import { ThemeToggle } from "@/client/components/theme-toggle";
 import { Button } from "@/client/components/ui/button";
 import { UserDropdown } from "@/client/components/user-dropdown";
-import { searchQueryOptions, useSearch } from "@/client/hooks/use-search";
+import {
+	infiniteSearchQueryOptions,
+	useInfiniteSearch,
+} from "@/client/hooks/use-search";
 import {
 	SearchCategory,
 	type SearchCategory as SearchCategoryType,
@@ -71,8 +75,8 @@ export const Route = createFileRoute("/_authed/search/")({
 		// Normalize category to match component behavior and avoid double-fetch
 		// Component defaults undefined category to SearchCategory.WEB
 		void context.queryClient
-			.ensureQueryData(
-				searchQueryOptions({
+			.prefetchInfiniteQuery(
+				infiniteSearchQueryOptions({
 					query: q,
 					category: category ?? SearchCategory.WEB,
 					timeRange,
@@ -158,15 +162,29 @@ function SearchResultsList({
 	category: SearchCategoryType;
 	timeRange?: TimeRangeType;
 }) {
-	const { data: searchResult } = useSearch({
-		query,
-		category,
-		timeRange,
-	});
+	const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+		useInfiniteSearch({ query, category, timeRange });
 
 	if (!query) return null;
 
-	return <SearchResults query={query} results={searchResult} />;
+	const mergedResults = {
+		results: data.pages.flatMap((p) => p.results),
+		count: data.pages.reduce((sum, p) => sum + p.count, 0),
+		duration: data.pages[0].duration,
+		cached: data.pages[0].cached,
+	};
+
+	return (
+		<>
+			<SearchResults query={query} results={mergedResults} />
+			{hasNextPage && (
+				<InfiniteScrollSentinel
+					onVisible={fetchNextPage}
+					loading={isFetchingNextPage}
+				/>
+			)}
+		</>
+	);
 }
 
 function SearchPage() {

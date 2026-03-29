@@ -116,7 +116,7 @@ export const makeSearXngSearchEngine = ({
 	});
 
 	return {
-		search: async ({ query, category, safeSearch, timeRange }) => {
+		search: async ({ query, category, safeSearch, timeRange, page }) => {
 			const startedAt = performance.now();
 			const params = new URLSearchParams({
 				q: query,
@@ -136,6 +136,10 @@ export const makeSearXngSearchEngine = ({
 			const safesearchParam = toSearXngSafeSearchParam(safeSearch);
 			if (safesearchParam) {
 				params.set("safesearch", safesearchParam);
+			}
+
+			if (page && page > 1) {
+				params.set("pageno", String(page));
 			}
 
 			const endpoint = "/search";
@@ -207,6 +211,7 @@ export const makeSearXngSearchEngine = ({
 					endpoint,
 					status: response.status,
 					resultCount: result.count,
+					page: page ?? 1,
 					durationMs: Math.round(performance.now() - startedAt),
 				},
 				"SearXNG search request completed",

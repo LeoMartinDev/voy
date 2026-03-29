@@ -25,6 +25,7 @@ const searchInputSchema = z.object({
 		.enum(Object.values(TimeRange) as [string, ...string[]])
 		.optional()
 		.transform((val) => val as TimeRangeType | undefined),
+	page: z.coerce.number().int().min(1).optional(),
 });
 
 const logger = withLogContext({
@@ -67,6 +68,7 @@ export const searchFn = createServerFn({ method: "GET" })
 				query: data.query,
 				category: data.category,
 				timeRange: data.timeRange,
+				page: data.page,
 			});
 			requestContext.logger.info(
 				{

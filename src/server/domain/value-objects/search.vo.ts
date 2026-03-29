@@ -83,6 +83,7 @@ export interface SearchInput {
 	timeRange?: TimeRange;
 	locale?: string;
 	safeSearch?: SafeSearch;
+	page?: number;
 }
 
 export type BaseSearchResult = {
