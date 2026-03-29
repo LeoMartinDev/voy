@@ -19,6 +19,7 @@ export const SearchCategory = {
 	WEB: "web",
 	IMAGES: "images",
 	FILES: "files",
+	VIDEOS: "videos",
 } as const;
 
 export type SearchCategory =
@@ -28,6 +29,7 @@ export const ResultType = {
 	WEB: "web",
 	IMAGE: "image",
 	FILE: "file",
+	VIDEO: "video",
 } as const;
 
 export type ResultType = (typeof ResultType)[keyof typeof ResultType];
@@ -54,10 +56,19 @@ export interface FileResultEntry extends BaseResultEntry {
 	extension: string;
 }
 
+export interface VideoResultEntry extends BaseResultEntry {
+	type: typeof ResultType.VIDEO;
+	thumbnail: string | undefined;
+	iframeSrc: string | undefined;
+	content: string;
+	publishedDate: Date | undefined;
+}
+
 export type SearchResultEntry =
 	| WebResultEntry
 	| ImageResultEntry
-	| FileResultEntry;
+	| FileResultEntry
+	| VideoResultEntry;
 
 export function isWebResult(
 	result: SearchResultEntry,
@@ -75,6 +86,12 @@ export function isFileResult(
 	result: SearchResultEntry,
 ): result is FileResultEntry {
 	return result.type === ResultType.FILE;
+}
+
+export function isVideoResult(
+	result: SearchResultEntry,
+): result is VideoResultEntry {
+	return result.type === ResultType.VIDEO;
 }
 
 export interface SearchInput {
